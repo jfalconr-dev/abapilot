@@ -1,13 +1,34 @@
 # Contribución
 
-Aunque ABAPilot es un TFM individual, se aplica un flujo profesional para garantizar trazabilidad.
+El desarrollo de ABAPilot sigue un flujo de trabajo basado en buenas prácticas de ingeniería del software.
 
-1. Crear una rama desde `develop`.
-2. Implementar un cambio pequeño y coherente.
-3. Añadir o actualizar pruebas.
-4. Ejecutar `npm run validate`.
-5. Crear un commit siguiendo Conventional Commits.
-6. Abrir una pull request hacia `develop`.
-7. Integrar solo cuando CI sea satisfactorio.
+## Estrategia de ramas
 
-Nunca se deben incluir claves de API, contraseñas, datos corporativos ni documentación SAP con restricciones de licencia.
+- `main` contiene únicamente versiones estables.
+- `develop` integra el desarrollo de la siguiente versión.
+- Las ramas `feature/*` podrán utilizarse para funcionalidades concretas cuando sea necesario.
+
+## Commits
+
+Los mensajes siguen la especificación **Conventional Commits** y se redactan en inglés.
+
+Ejemplos:
+
+```text
+feat: add diagnosis endpoint
+fix: correct request validation
+docs: update architecture documentation
+test: add unit tests
+```
+
+## Validación
+
+Antes de publicar cualquier cambio debe ejecutarse:
+
+```bash
+npm run validate
+```
+
+## Integración continua
+
+GitHub Actions valida automáticamente el proyecto en cada actualización del repositorio.
