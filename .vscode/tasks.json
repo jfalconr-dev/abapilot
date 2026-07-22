@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ABAPilot: validar proyecto",
+      "type": "npm",
+      "script": "validate",
+      "problemMatcher": ["$eslint-stylish", "$tsc"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "ABAPilot: ejecutar tests",
+      "type": "npm",
+      "script": "test:watch",
+      "problemMatcher": [],
+      "isBackground": true
+    }
+  ]
+}

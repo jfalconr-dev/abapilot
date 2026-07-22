@@ -1,0 +1,10 @@
+import { describe, expect, it } from 'vitest';
+
+import { getProjectMetadata } from '../src/index.js';
+
+describe('getProjectMetadata', () => {
+  it('exposes the project identity', () => {
+    expect(getProjectMetadata().name).toBe('ABAPilot');
+    expect(getProjectMetadata().version).toBe('0.1.0');
+  });
+});
