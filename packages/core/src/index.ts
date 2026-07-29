@@ -1,3 +1,5 @@
+export type { AIProvider } from './application/index.js';
+
 export type { Context, Query, Response, SapProfessional } from './domain/index.js';
 
 export const PROJECT_NAME = 'ABAPilot' as const;
