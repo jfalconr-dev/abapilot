@@ -1,3 +1,5 @@
+export type { Context, Query, Response, SapProfessional } from './domain/index.js';
+
 export const PROJECT_NAME = 'ABAPilot' as const;
 export const PROJECT_VERSION = '0.1.0' as const;
 
@@ -10,5 +12,5 @@ export interface ProjectMetadata {
 export const getProjectMetadata = (): ProjectMetadata => ({
   name: PROJECT_NAME,
   version: PROJECT_VERSION,
-  description: 'AI Workspace para consultores SAP ECC',
+  description: 'AI Workspace para profesionales SAP ECC',
 });
