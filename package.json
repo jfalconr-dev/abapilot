@@ -2,7 +2,7 @@
   "name": "abapilot",
   "version": "0.1.0",
   "private": true,
-  "description": "AI Workspace para consultores SAP ECC.",
+  "description": "AI Workspace para consultores SAP ECC",
   "license": "MIT",
   "engines": {
     "node": ">=22 <23",
