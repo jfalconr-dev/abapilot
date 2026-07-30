@@ -1,7 +1,7 @@
 export type { AIProvider } from './application/index.js';
-export { AnswerQueryUseCase } from './application/index.js';
+export { AnswerQueryUseCase, ExplainAbapCodeUseCase } from './application/index.js';
 
-export type { Context, Query, Response, SapProfessional } from './domain/index.js';
+export type { AbapCode, Context, Query, Response, SapProfessional } from './domain/index.js';
 
 export const PROJECT_NAME = 'ABAPilot' as const;
 export const PROJECT_VERSION = '0.1.0' as const;
