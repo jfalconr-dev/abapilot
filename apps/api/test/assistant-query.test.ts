@@ -26,7 +26,10 @@ describe('POST /assistant/query', () => {
   });
 
   it('returns status 400 when the query is empty', async () => {
-    await request(createApp()).post('/assistant/query').send({ query: '   ' }).expect(400).expect({
+    const response = await request(createApp()).post('/assistant/query').send({ query: '   ' });
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
       error: 'El campo query es obligatorio y debe contener texto.',
     });
   });
