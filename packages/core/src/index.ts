@@ -1,5 +1,10 @@
 export type { AIProvider } from './application/index.js';
-export { AnswerQueryUseCase, ExplainAbapCodeUseCase } from './application/index.js';
+
+export {
+  AnswerQueryUseCase,
+  ExplainAbapCodeUseCase,
+  ReviewAbapCodeUseCase,
+} from './application/index.js';
 
 export type { AbapCode, Context, Query, Response, SapProfessional } from './domain/index.js';
 

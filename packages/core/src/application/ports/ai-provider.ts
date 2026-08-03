@@ -7,4 +7,6 @@ export interface AIProvider {
   generateResponse(query: Query, context?: Context): Promise<Response>;
 
   explainCode(code: AbapCode, context?: Context): Promise<Response>;
+
+  reviewCode(code: AbapCode, context?: Context): Promise<Response>;
 }

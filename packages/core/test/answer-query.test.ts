@@ -27,6 +27,7 @@ describe('AnswerQueryUseCase', () => {
     const aiProvider: AIProvider = {
       generateResponse,
       explainCode: vi.fn(),
+      reviewCode: vi.fn(),
     };
 
     const useCase = new AnswerQueryUseCase(aiProvider);
