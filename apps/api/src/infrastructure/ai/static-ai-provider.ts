@@ -16,4 +16,12 @@ export class StaticAIProvider implements AIProvider {
       content: `Explicación estática para el código ABAP: ${code.content}${contextReference}`,
     });
   }
+
+  public reviewCode(code: AbapCode, context?: Context): Promise<Response> {
+    const contextReference = context ? ` Contexto recibido: ${context.content}` : '';
+
+    return Promise.resolve({
+      content: `Revisión estática para el código ABAP: ${code.content}${contextReference}`,
+    });
+  }
 }

@@ -4,6 +4,7 @@ import type {
   Context,
   ExplainAbapCodeUseCase,
   Query,
+  ReviewAbapCodeUseCase,
 } from '@abapilot/core';
 import type { NextFunction, Request, Response } from 'express';
 
@@ -21,6 +22,7 @@ export class AssistantController {
   public constructor(
     private readonly answerQueryUseCase: AnswerQueryUseCase,
     private readonly explainAbapCodeUseCase: ExplainAbapCodeUseCase,
+    private readonly reviewAbapCodeUseCase: ReviewAbapCodeUseCase,
   ) {}
 
   public async query(
@@ -78,6 +80,38 @@ export class AssistantController {
 
     try {
       const result = await this.explainAbapCodeUseCase.execute(code, context);
+
+      response.status(200).json({
+        response: result.content,
+      });
+    } catch (error: unknown) {
+      next(error);
+    }
+  }
+
+  public async review(
+    request: Request<Record<string, never>, unknown, AssistantExplainRequestBody>,
+    response: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const codeContent = request.body.code;
+
+    if (typeof codeContent !== 'string' || codeContent.trim().length === 0) {
+      response.status(400).json({
+        error: 'El campo code es obligatorio y debe contener código ABAP.',
+      });
+
+      return;
+    }
+
+    const code: AbapCode = {
+      content: codeContent.trim(),
+    };
+
+    const context = this.createContext(request.body.context);
+
+    try {
+      const result = await this.reviewAbapCodeUseCase.execute(code, context);
 
       response.status(200).json({
         response: result.content,
