@@ -13,7 +13,7 @@ interface AssistantQueryRequestBody {
   readonly context?: unknown;
 }
 
-interface AssistantExplainRequestBody {
+interface AssistantCodeRequestBody {
   readonly code?: unknown;
   readonly context?: unknown;
 }
@@ -58,7 +58,7 @@ export class AssistantController {
   }
 
   public async explain(
-    request: Request<Record<string, never>, unknown, AssistantExplainRequestBody>,
+    request: Request<Record<string, never>, unknown, AssistantCodeRequestBody>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
@@ -90,7 +90,7 @@ export class AssistantController {
   }
 
   public async review(
-    request: Request<Record<string, never>, unknown, AssistantExplainRequestBody>,
+    request: Request<Record<string, never>, unknown, AssistantCodeRequestBody>,
     response: Response,
     next: NextFunction,
   ): Promise<void> {
