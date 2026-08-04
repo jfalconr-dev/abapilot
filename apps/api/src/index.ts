@@ -9,5 +9,3 @@ export const getHealthStatus = (): HealthStatus => ({
   version: '0.1.0',
   status: 'ok',
 });
-
-export { answerQueryUseCase } from './application/index.js';
