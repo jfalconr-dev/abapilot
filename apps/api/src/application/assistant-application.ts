@@ -1,8 +1,8 @@
 import { AnswerQueryUseCase, ExplainAbapCodeUseCase, ReviewAbapCodeUseCase } from '@abapilot/core';
 
-import { StaticAIProvider } from '../infrastructure/ai/index.js';
+import { createAIProvider } from '../infrastructure/ai/index.js';
 
-const aiProvider = new StaticAIProvider();
+const aiProvider = createAIProvider();
 
 export const answerQueryUseCase = new AnswerQueryUseCase(aiProvider);
 
