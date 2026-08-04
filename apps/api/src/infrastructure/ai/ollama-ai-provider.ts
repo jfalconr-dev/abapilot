@@ -8,6 +8,15 @@ interface OllamaGenerateResponse {
 
 type FetchClient = typeof fetch;
 
+const systemPrompt = `Eres un asistente especializado en SAP ECC y desarrollo ABAP.
+
+Tu prioridad es proporcionar información técnicamente correcta y útil.
+No inventes transacciones, objetos del repositorio, APIs, clases ni procedimientos SAP.
+Si no conoces con suficiente certeza una respuesta, indícalo expresamente.
+Si la respuesta depende de la versión, del tipo de ampliación o de información no proporcionada, explica esa dependencia o solicita el dato necesario.
+Distingue claramente entre hechos confirmados, recomendaciones y aspectos que deben verificarse.
+Responde en español de forma concisa y práctica.`;
+
 export class OllamaAIProvider implements AIProvider {
   public constructor(
     private readonly config: OllamaConfig,
@@ -48,8 +57,12 @@ export class OllamaAIProvider implements AIProvider {
       },
       body: JSON.stringify({
         model: this.config.model,
+        system: systemPrompt,
         prompt,
         stream: false,
+        options: {
+          temperature: 0.2,
+        },
       }),
       signal: AbortSignal.timeout(this.config.timeoutMs),
     });

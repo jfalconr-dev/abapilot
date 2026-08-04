@@ -8,6 +8,15 @@ const config = {
   timeoutMs: 120_000,
 };
 
+const systemPrompt = `Eres un asistente especializado en SAP ECC y desarrollo ABAP.
+
+Tu prioridad es proporcionar información técnicamente correcta y útil.
+No inventes transacciones, objetos del repositorio, APIs, clases ni procedimientos SAP.
+Si no conoces con suficiente certeza una respuesta, indícalo expresamente.
+Si la respuesta depende de la versión, del tipo de ampliación o de información no proporcionada, explica esa dependencia o solicita el dato necesario.
+Distingue claramente entre hechos confirmados, recomendaciones y aspectos que deben verificarse.
+Responde en español de forma concisa y práctica.`;
+
 describe('OllamaAIProvider', () => {
   it('should generate a response for a query', async () => {
     const fetchClient = vi.fn<typeof fetch>().mockResolvedValue(
@@ -47,11 +56,15 @@ describe('OllamaAIProvider', () => {
         },
         body: JSON.stringify({
           model: 'qwen2.5-coder:7b',
+          system: systemPrompt,
           prompt:
             'Responde a la siguiente consulta relacionada con el ecosistema SAP.\n\n' +
             'Contenido:\n¿Cómo puedo implementar una BAdI en SAP ECC?\n\n' +
             'Contexto adicional:\nEl usuario desarrolla en ABAP sobre SAP ECC.',
           stream: false,
+          options: {
+            temperature: 0.2,
+          },
         }),
       }),
     );
@@ -149,7 +162,11 @@ const expectRequestPrompt = (
 
   expect(parsedRequestBody).toEqual({
     model: 'qwen2.5-coder:7b',
+    system: systemPrompt,
     prompt: expectedPrompt,
     stream: false,
+    options: {
+      temperature: 0.2,
+    },
   });
 };
