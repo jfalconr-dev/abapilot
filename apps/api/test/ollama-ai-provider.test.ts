@@ -10,11 +10,13 @@ const config = {
 
 const systemPrompt = `Eres un asistente especializado en SAP ECC y desarrollo ABAP.
 
-Tu prioridad es proporcionar información técnicamente correcta y útil.
-No inventes transacciones, objetos del repositorio, APIs, clases ni procedimientos SAP.
+Tu prioridad es proporcionar información técnicamente correcta, útil y verificable.
+No inventes transacciones, objetos del repositorio, tablas, campos, APIs, clases, métodos ni procedimientos SAP.
+No presentes como válido código ABAP cuya sintaxis, tipos de datos o compatibilidad no puedas justificar.
 Si no conoces con suficiente certeza una respuesta, indícalo expresamente.
-Si la respuesta depende de la versión, del tipo de ampliación o de información no proporcionada, explica esa dependencia o solicita el dato necesario.
+Si la respuesta depende de la versión de SAP, de la versión de ABAP, del tipo de ampliación o de información no proporcionada, explica esa dependencia o solicita el dato necesario.
 Distingue claramente entre hechos confirmados, recomendaciones y aspectos que deben verificarse.
+Prioriza la corrección sobre la extensión de la respuesta.
 Responde en español de forma concisa y práctica.`;
 
 describe('OllamaAIProvider', () => {
@@ -58,7 +60,9 @@ describe('OllamaAIProvider', () => {
           model: 'qwen2.5-coder:7b',
           system: systemPrompt,
           prompt:
-            'Responde a la siguiente consulta relacionada con el ecosistema SAP.\n\n' +
+            'Responde a la siguiente consulta relacionada con SAP ECC o el desarrollo ABAP. ' +
+            'Proporciona una respuesta técnicamente precisa, directa y ajustada al contexto. ' +
+            'No presupongas datos ni características del sistema que no se hayan indicado.\n\n' +
             'Contenido:\n¿Cómo puedo implementar una BAdI en SAP ECC?\n\n' +
             'Contexto adicional:\nEl usuario desarrolla en ABAP sobre SAP ECC.',
           stream: false,
@@ -83,7 +87,9 @@ describe('OllamaAIProvider', () => {
 
     expectRequestPrompt(
       fetchClient,
-      'Explica de forma clara el siguiente código ABAP.\n\n' +
+      'Explica de forma clara el siguiente código ABAP. Describe su propósito y comportamiento, ' +
+        'e identifica brevemente posibles implicaciones de rendimiento, seguridad o mantenibilidad. ' +
+        'No propongas modificaciones salvo que sean necesarias para explicar un problema relevante.\n\n' +
         'Contenido:\nDATA lv_value TYPE string.',
     );
   });
@@ -98,8 +104,11 @@ describe('OllamaAIProvider', () => {
 
     expectRequestPrompt(
       fetchClient,
-      'Revisa el siguiente código ABAP e identifica oportunidades de mejora en su ' +
-        'legibilidad, mantenibilidad y buenas prácticas.\n\n' +
+      'Revisa el siguiente código ABAP en cuanto a corrección, rendimiento, seguridad, ' +
+        'legibilidad, mantenibilidad y buenas prácticas. Prioriza los problemas por relevancia. ' +
+        'Si propones código alternativo, utiliza tipos compatibles, selecciona únicamente los ' +
+        'campos necesarios y no presupongas una versión de ABAP no indicada. Señala expresamente ' +
+        'cualquier aspecto que dependa del contexto o que deba verificarse.\n\n' +
         'Contenido:\nWRITE lv_value.',
     );
   });
