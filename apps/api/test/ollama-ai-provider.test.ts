@@ -16,6 +16,11 @@ No presentes como válido código ABAP cuya sintaxis, tipos de datos o compatibi
 Si no conoces con suficiente certeza una respuesta, indícalo expresamente.
 Si la respuesta depende de la versión de SAP, de la versión de ABAP, del tipo de ampliación o de información no proporcionada, explica esa dependencia o solicita el dato necesario.
 Distingue claramente entre hechos confirmados, recomendaciones y aspectos que deben verificarse.
+No presentes como error confirmado aquello que solo sea un riesgo o dependa del contexto.
+No afirmes compatibilidad con una versión de ABAP si no se ha proporcionado esa versión.
+Propón código alternativo solo cuando puedas justificar su sintaxis y conservar el comportamiento funcional del código original.
+Antes de incluir código alternativo, comprueba que sea coherente con la explicación que lo acompaña.
+Si no puedes garantizar una corrección válida, describe el cambio necesario sin generar código.
 Prioriza la corrección sobre la extensión de la respuesta.
 Responde en español de forma concisa y práctica.`;
 
@@ -105,10 +110,22 @@ describe('OllamaAIProvider', () => {
     expectRequestPrompt(
       fetchClient,
       'Revisa el siguiente código ABAP en cuanto a corrección, rendimiento, seguridad, ' +
-        'legibilidad, mantenibilidad y buenas prácticas. Prioriza los problemas por relevancia. ' +
-        'Si propones código alternativo, utiliza tipos compatibles, selecciona únicamente los ' +
-        'campos necesarios y no presupongas una versión de ABAP no indicada. Señala expresamente ' +
-        'cualquier aspecto que dependa del contexto o que deba verificarse.\n\n' +
+        'legibilidad, mantenibilidad y buenas prácticas. Ordena los hallazgos por relevancia. ' +
+        'Clasifica cada hallazgo exclusivamente como error confirmado, riesgo condicionado o ' +
+        'mejora opcional, y justifica la clasificación. No presentes como error una consecuencia ' +
+        'normal de ABAP ni una situación que dependa de requisitos desconocidos. Las declaraciones ' +
+        'inline mediante DATA(...) no requieren una inicialización previa independiente; considera ' +
+        'su compatibilidad dependiente de la versión de ABAP. No inventes campos, filtros, ' +
+        'requisitos funcionales, autorizaciones ni características del sistema. En operaciones de ' +
+        'lectura sin condiciones, señala el posible riesgo de volumen cuando no se conozca el tamaño ' +
+        'de los datos, sin afirmar que exista necesariamente un problema. Si faltan la versión de ' +
+        'ABAP, el volumen de datos o el objetivo funcional y condicionan la solución, indica qué ' +
+        'información debe verificarse. Puedes incluir únicamente fragmentos mínimos de código para ' +
+        'ilustrar mejoras concretas cuya validez puedas justificar. No generes una versión completa ' +
+        'del programa ni presentes un fragmento como solución integral. Cada fragmento debe limitarse ' +
+        'al hallazgo explicado, conservar el comportamiento conocido y no depender de declaraciones ' +
+        'omitidas o duplicadas. Indica expresamente qué aspectos permanecen sin resolver por falta de ' +
+        'contexto. Si no puedes garantizar un fragmento válido, describe el cambio sin generar código.\n\n' +
         'Contenido:\nWRITE lv_value.',
     );
   });
