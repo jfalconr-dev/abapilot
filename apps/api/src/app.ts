@@ -1,5 +1,6 @@
 import express, { type Express } from 'express';
 
+import { errorHandler } from './presentation/error-handler.js';
 import { assistantRouter, healthRouter } from './presentation/index.js';
 
 export const createApp = (): Express => {
@@ -9,6 +10,8 @@ export const createApp = (): Express => {
 
   app.use('/health', healthRouter);
   app.use('/assistant', assistantRouter);
+
+  app.use(errorHandler);
 
   return app;
 };
