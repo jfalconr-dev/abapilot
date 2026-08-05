@@ -6,8 +6,6 @@ export const errorHandler = (
   response: Response,
   _next: NextFunction,
 ): void => {
-  void _next;
-
   response.status(500).json({
     error: 'Se ha producido un error interno.',
   });
