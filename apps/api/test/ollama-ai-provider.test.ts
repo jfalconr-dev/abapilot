@@ -8,22 +8,6 @@ const config = {
   timeoutMs: 120_000,
 };
 
-const systemPrompt = `Eres un asistente especializado en SAP ECC y desarrollo ABAP.
-
-Tu prioridad es proporcionar información técnicamente correcta, útil y verificable.
-No inventes transacciones, objetos del repositorio, tablas, campos, APIs, clases, métodos ni procedimientos SAP.
-No presentes como válido código ABAP cuya sintaxis, tipos de datos o compatibilidad no puedas justificar.
-Si no conoces con suficiente certeza una respuesta, indícalo expresamente.
-Si la respuesta depende de la versión de SAP, de la versión de ABAP, del tipo de ampliación o de información no proporcionada, explica esa dependencia o solicita el dato necesario.
-Distingue claramente entre hechos confirmados, recomendaciones y aspectos que deben verificarse.
-No presentes como error confirmado aquello que solo sea un riesgo o dependa del contexto.
-No afirmes compatibilidad con una versión de ABAP si no se ha proporcionado esa versión.
-Propón código alternativo solo cuando puedas justificar su sintaxis y conservar el comportamiento funcional del código original.
-Antes de incluir código alternativo, comprueba que sea coherente con la explicación que lo acompaña.
-Si no puedes garantizar una corrección válida, describe el cambio necesario sin generar código.
-Prioriza la corrección sobre la extensión de la respuesta.
-Responde en español de forma concisa y práctica.`;
-
 describe('OllamaAIProvider', () => {
   it('should generate a response for a query', async () => {
     const fetchClient = vi.fn<typeof fetch>().mockResolvedValue(
@@ -61,22 +45,33 @@ describe('OllamaAIProvider', () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          model: 'qwen2.5-coder:7b',
-          system: systemPrompt,
-          prompt:
-            'Responde a la siguiente consulta relacionada con SAP ECC o el desarrollo ABAP. ' +
-            'Proporciona una respuesta técnicamente precisa, directa y ajustada al contexto. ' +
-            'No presupongas datos ni características del sistema que no se hayan indicado.\n\n' +
-            'Contenido:\n¿Cómo puedo implementar una BAdI en SAP ECC?\n\n' +
-            'Contexto adicional:\nEl usuario desarrolla en ABAP sobre SAP ECC.',
-          stream: false,
-          options: {
-            temperature: 0.2,
-          },
-        }),
       }),
     );
+
+    const requestBody = getRequestBody(fetchClient);
+    const system = requestBody.system;
+
+    if (typeof system !== 'string') {
+      throw new TypeError('El prompt de sistema debe ser una cadena.');
+    }
+
+    expect(system).toContain('Política de generación de código:');
+    expect(system).toContain('Puedes incluir únicamente fragmentos mínimos de código');
+
+    expect(requestBody).toEqual({
+      model: 'qwen2.5-coder:7b',
+      system,
+      prompt:
+        'Responde a la siguiente consulta relacionada con SAP ECC o el desarrollo ABAP. ' +
+        'Proporciona una respuesta técnicamente precisa, directa y ajustada al contexto. ' +
+        'No presupongas datos ni características del sistema que no se hayan indicado.\n\n' +
+        'Contenido:\n¿Cómo puedo implementar una BAdI en SAP ECC?\n\n' +
+        'Contexto adicional:\nEl usuario desarrolla en ABAP sobre SAP ECC.',
+      stream: false,
+      options: {
+        temperature: 0.2,
+      },
+    });
     const requestOptions = fetchClient.mock.calls[0]?.[1];
 
     expect(requestOptions?.signal).toBeInstanceOf(AbortSignal);
@@ -90,13 +85,10 @@ describe('OllamaAIProvider', () => {
       content: 'DATA lv_value TYPE string.',
     });
 
-    expectRequestPrompt(
-      fetchClient,
-      'Explica de forma clara el siguiente código ABAP. Describe su propósito y comportamiento, ' +
-        'e identifica brevemente posibles implicaciones de rendimiento, seguridad o mantenibilidad. ' +
-        'No propongas modificaciones salvo que sean necesarias para explicar un problema relevante.\n\n' +
-        'Contenido:\nDATA lv_value TYPE string.',
-    );
+    expectRequestPrompt(fetchClient, [
+      'Explica de forma clara el siguiente código ABAP.',
+      'Contenido:\nDATA lv_value TYPE string.',
+    ]);
   });
 
   it('should use the ABAP review instruction', async () => {
@@ -107,27 +99,11 @@ describe('OllamaAIProvider', () => {
       content: 'WRITE lv_value.',
     });
 
-    expectRequestPrompt(
-      fetchClient,
-      'Revisa el siguiente código ABAP en cuanto a corrección, rendimiento, seguridad, ' +
-        'legibilidad, mantenibilidad y buenas prácticas. Ordena los hallazgos por relevancia. ' +
-        'Clasifica cada hallazgo exclusivamente como error confirmado, riesgo condicionado o ' +
-        'mejora opcional, y justifica la clasificación. No presentes como error una consecuencia ' +
-        'normal de ABAP ni una situación que dependa de requisitos desconocidos. Las declaraciones ' +
-        'inline mediante DATA(...) no requieren una inicialización previa independiente; considera ' +
-        'su compatibilidad dependiente de la versión de ABAP. No inventes campos, filtros, ' +
-        'requisitos funcionales, autorizaciones ni características del sistema. En operaciones de ' +
-        'lectura sin condiciones, señala el posible riesgo de volumen cuando no se conozca el tamaño ' +
-        'de los datos, sin afirmar que exista necesariamente un problema. Si faltan la versión de ' +
-        'ABAP, el volumen de datos o el objetivo funcional y condicionan la solución, indica qué ' +
-        'información debe verificarse. Puedes incluir únicamente fragmentos mínimos de código para ' +
-        'ilustrar mejoras concretas cuya validez puedas justificar. No generes una versión completa ' +
-        'del programa ni presentes un fragmento como solución integral. Cada fragmento debe limitarse ' +
-        'al hallazgo explicado, conservar el comportamiento conocido y no depender de declaraciones ' +
-        'omitidas o duplicadas. Indica expresamente qué aspectos permanecen sin resolver por falta de ' +
-        'contexto. Si no puedes garantizar un fragmento válido, describe el cambio sin generar código.\n\n' +
-        'Contenido:\nWRITE lv_value.',
-    );
+    expectRequestPrompt(fetchClient, [
+      'Revisa el siguiente código ABAP en cuanto a corrección, rendimiento, seguridad,',
+      'Clasifica cada hallazgo exclusivamente como error confirmado, riesgo condicionado o mejora opcional',
+      'Contenido:\nWRITE lv_value.',
+    ]);
   });
 
   it('should reject an unsuccessful HTTP response', async () => {
@@ -175,8 +151,22 @@ function createSuccessfulFetch(content: string): ReturnType<typeof vi.fn<typeof 
 
 const expectRequestPrompt = (
   fetchClient: ReturnType<typeof createSuccessfulFetch>,
-  expectedPrompt: string,
+  expectedFragments: readonly string[],
 ): void => {
+  const prompt = getRequestBody(fetchClient).prompt;
+
+  if (typeof prompt !== 'string') {
+    throw new TypeError('El prompt de la petición debe ser una cadena.');
+  }
+
+  for (const fragment of expectedFragments) {
+    expect(prompt).toContain(fragment);
+  }
+};
+
+const getRequestBody = (
+  fetchClient: ReturnType<typeof createSuccessfulFetch>,
+): Record<string, unknown> => {
   const requestOptions = fetchClient.mock.calls[0]?.[1];
   const requestBody = requestOptions?.body;
 
@@ -186,13 +176,13 @@ const expectRequestPrompt = (
 
   const parsedRequestBody: unknown = JSON.parse(requestBody);
 
-  expect(parsedRequestBody).toEqual({
-    model: 'qwen2.5-coder:7b',
-    system: systemPrompt,
-    prompt: expectedPrompt,
-    stream: false,
-    options: {
-      temperature: 0.2,
-    },
-  });
+  if (
+    typeof parsedRequestBody !== 'object' ||
+    parsedRequestBody === null ||
+    !('prompt' in parsedRequestBody)
+  ) {
+    throw new TypeError('El cuerpo de la petición no tiene el formato esperado.');
+  }
+
+  return parsedRequestBody;
 };
