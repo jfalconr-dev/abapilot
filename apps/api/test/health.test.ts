@@ -8,7 +8,7 @@ describe('getHealthStatus', () => {
   it('returns a deterministic healthy status', () => {
     expect(getHealthStatus()).toEqual({
       service: 'abapilot-api',
-      version: '0.1.0',
+      version: '0.2.0',
       status: 'ok',
     });
   });
@@ -21,7 +21,7 @@ describe('GET /health', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       service: 'abapilot-api',
-      version: '0.1.0',
+      version: '0.2.0',
       status: 'ok',
     });
   });

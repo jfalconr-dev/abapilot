@@ -6,9 +6,22 @@ El formato se inspira en Keep a Changelog y el proyecto utiliza versionado semá
 
 ## [Unreleased]
 
-### Planned
+## [0.2.0] - 2026-08-06
 
-- Interfaz base y navegación para v0.2.0.
+### Added
+
+- API REST basada en Express.
+- Arquitectura por capas con separación entre dominio, aplicación, infraestructura y presentación.
+- Casos de uso para consultas generales, explicación de código ABAP y revisión de código ABAP.
+- Endpoints `POST /assistant/query`, `POST /assistant/explain` y `POST /assistant/review`.
+- Integración con Ollama mediante un proveedor de IA intercambiable.
+- Proveedor estático para pruebas y ejecución determinista.
+- Configuración del proveedor, modelo, URL y tiempo de espera mediante variables de entorno.
+- Política centralizada de prompts y capacidades configurables del modelo.
+- Validación de las solicitudes y tratamiento centralizado de errores.
+- Endpoint técnico `GET /health`.
+- Pruebas automatizadas del núcleo, la API, los proveedores y la configuración.
+- Documento de diseño de la versión v0.2.0.
 
 ## [0.1.0] - 2026-07-22
 
