@@ -4,33 +4,72 @@ import { describe, expect, it } from 'vitest';
 import { createApp } from '../src/app.js';
 
 describe('POST /assistant/query', () => {
-  it('returns a response for a valid query', async () => {
+  it('returns the exact JSON response for a valid query', async () => {
     const query = '¿Cómo puedo analizar un dump ABAP?';
 
     const response = await request(createApp()).post('/assistant/query').send({ query });
 
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toContain('application/json');
-    expect(response.text).toContain(query);
+    expect(response.body).toEqual({
+      response: `Respuesta estática para la consulta: ${query}`,
+    });
   });
 
-  it('includes the optional context in the response', async () => {
-    const query = '¿Cómo puedo analizar un dump ABAP?';
-    const context = 'El dump se ha producido en un proceso de fondo.';
-
-    const response = await request(createApp()).post('/assistant/query').send({ query, context });
+  it('trims the query and context', async () => {
+    const response = await request(createApp()).post('/assistant/query').send({
+      query: '  ¿Cómo puedo analizar un dump ABAP?  ',
+      context: '  El dump se ha producido en un proceso de fondo.  ',
+    });
 
     expect(response.status).toBe(200);
-    expect(response.text).toContain(query);
-    expect(response.text).toContain(context);
+    expect(response.body).toEqual({
+      response:
+        'Respuesta estática para la consulta: ¿Cómo puedo analizar un dump ABAP?' +
+        ' Contexto recibido: El dump se ha producido en un proceso de fondo.',
+    });
   });
 
-  it('returns status 400 when the query is empty', async () => {
-    const response = await request(createApp()).post('/assistant/query').send({ query: '   ' });
+  it.each([
+    ['empty', '   '],
+    ['null', null],
+    ['number', 42],
+    ['boolean', true],
+    ['object', {}],
+    ['array', []],
+  ])('returns status 400 when the query is %s', async (_description, query) => {
+    const response = await request(createApp()).post('/assistant/query').send({ query });
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
       error: 'El campo query es obligatorio y debe contener texto.',
+    });
+  });
+
+  it('returns status 400 when the query is missing', async () => {
+    const response = await request(createApp()).post('/assistant/query').send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      error: 'El campo query es obligatorio y debe contener texto.',
+    });
+  });
+
+  it.each([
+    ['empty', '   '],
+    ['null', null],
+    ['number', 42],
+    ['boolean', true],
+    ['object', {}],
+    ['array', []],
+  ])('ignores the context when it is %s', async (_description, context) => {
+    const query = '¿Cómo puedo analizar un dump ABAP?';
+
+    const response = await request(createApp()).post('/assistant/query').send({ query, context });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      response: `Respuesta estática para la consulta: ${query}`,
     });
   });
 });
