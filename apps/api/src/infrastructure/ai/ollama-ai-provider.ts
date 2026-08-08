@@ -1,9 +1,12 @@
-import type { AIProvider, AbapCode, Context, Query, Response } from '@abapilot/core';
+import type {
+  AIProvider,
+  AbapCode,
+  CodeSuggestionMode,
+  Context,
+  Query,
+  Response,
+} from '@abapilot/core';
 
-import {
-  resolveLlmModelCapabilities,
-  type LlmModelCapabilities,
-} from './llm-model-capabilities.js';
 import { buildLlmPrompt, type LlmPrompt } from './llm-prompt-policy.js';
 import type { OllamaConfig } from './ollama-config.js';
 
@@ -14,14 +17,12 @@ interface OllamaGenerateResponse {
 type FetchClient = typeof fetch;
 
 export class OllamaAIProvider implements AIProvider {
-  private readonly modelCapabilities: LlmModelCapabilities;
-
   public constructor(
     private readonly config: OllamaConfig,
+    private readonly providerModel: string,
+    private readonly codeSuggestionMode: CodeSuggestionMode,
     private readonly fetchClient: FetchClient = fetch,
-  ) {
-    this.modelCapabilities = resolveLlmModelCapabilities('ollama', config.model);
-  }
+  ) {}
 
   public generateResponse(query: Query, context?: Context): Promise<Response> {
     return this.generate(
@@ -29,7 +30,7 @@ export class OllamaAIProvider implements AIProvider {
         operation: 'query',
         content: query.content,
         ...(context ? { context: context.content } : {}),
-        codeSuggestionMode: this.modelCapabilities.codeSuggestionMode,
+        codeSuggestionMode: this.codeSuggestionMode,
       }),
     );
   }
@@ -40,7 +41,7 @@ export class OllamaAIProvider implements AIProvider {
         operation: 'explain',
         content: code.content,
         ...(context ? { context: context.content } : {}),
-        codeSuggestionMode: this.modelCapabilities.codeSuggestionMode,
+        codeSuggestionMode: this.codeSuggestionMode,
       }),
     );
   }
@@ -51,7 +52,7 @@ export class OllamaAIProvider implements AIProvider {
         operation: 'review',
         content: code.content,
         ...(context ? { context: context.content } : {}),
-        codeSuggestionMode: this.modelCapabilities.codeSuggestionMode,
+        codeSuggestionMode: this.codeSuggestionMode,
       }),
     );
   }
@@ -63,7 +64,7 @@ export class OllamaAIProvider implements AIProvider {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: this.config.model,
+        model: this.providerModel,
         system: llmPrompt.system,
         prompt: llmPrompt.prompt,
         stream: false,

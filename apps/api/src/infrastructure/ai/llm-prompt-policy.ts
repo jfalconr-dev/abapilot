@@ -1,4 +1,4 @@
-import type { CodeSuggestionMode } from './llm-model-capabilities.js';
+import type { CodeSuggestionMode } from '@abapilot/core';
 
 export type LlmOperation = 'query' | 'explain' | 'review';
 

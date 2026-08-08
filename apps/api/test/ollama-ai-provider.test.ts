@@ -8,6 +8,9 @@ const config = {
   timeoutMs: 120_000,
 };
 
+const providerModel = 'qwen2.5-coder:7b';
+const codeSuggestionMode = 'snippets' as const;
+
 describe('OllamaAIProvider', () => {
   it('should generate a response for a query', async () => {
     const fetchClient = vi.fn<typeof fetch>().mockResolvedValue(
@@ -23,7 +26,7 @@ describe('OllamaAIProvider', () => {
         },
       ),
     );
-    const provider = new OllamaAIProvider(config, fetchClient);
+    const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
 
     const response = await provider.generateResponse(
       {
@@ -79,7 +82,7 @@ describe('OllamaAIProvider', () => {
 
   it('should use the ABAP explanation instruction', async () => {
     const fetchClient = createSuccessfulFetch('El código declara una variable.');
-    const provider = new OllamaAIProvider(config, fetchClient);
+    const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
 
     await provider.explainCode({
       content: 'DATA lv_value TYPE string.',
@@ -93,7 +96,7 @@ describe('OllamaAIProvider', () => {
 
   it('should use the ABAP review instruction', async () => {
     const fetchClient = createSuccessfulFetch('La revisión no identifica errores.');
-    const provider = new OllamaAIProvider(config, fetchClient);
+    const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
 
     await provider.reviewCode({
       content: 'WRITE lv_value.',
@@ -110,7 +113,7 @@ describe('OllamaAIProvider', () => {
     const fetchClient = vi
       .fn<typeof fetch>()
       .mockResolvedValue(new Response(null, { status: 500 }));
-    const provider = new OllamaAIProvider(config, fetchClient);
+    const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
 
     await expect(
       provider.generateResponse({
@@ -128,7 +131,7 @@ describe('OllamaAIProvider', () => {
         },
       }),
     );
-    const provider = new OllamaAIProvider(config, fetchClient);
+    const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
 
     await expect(
       provider.generateResponse({

@@ -13,8 +13,11 @@ export const createAIProvider = (environment: Environment = process.env): AIProv
     case 'static':
       return new StaticAIProvider();
 
-    case 'ollama':
-      return new OllamaAIProvider(loadOllamaConfig(environment));
+    case 'ollama': {
+      const config = loadOllamaConfig(environment);
+
+      return new OllamaAIProvider(config, config.model, 'snippets');
+    }
 
     default:
       throw new Error(
