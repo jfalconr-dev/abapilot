@@ -1,8 +1,11 @@
-export type { AIProvider } from './application/index.js';
+export type { AIProvider, CodeSuggestionMode, ModelDefinition } from './application/index.js';
 
 export {
   AnswerQueryUseCase,
+  DEFAULT_MODEL_ID,
   ExplainAbapCodeUseCase,
+  ModelCatalog,
+  ModelNotSupportedError,
   ReviewAbapCodeUseCase,
 } from './application/index.js';
 
