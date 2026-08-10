@@ -9,6 +9,7 @@ import { errorHandler } from './presentation/error-handler.js';
 import {
   createAssistantRouter,
   healthRouter,
+  modelsRouter,
   type AssistantRouterDependencies,
 } from './presentation/index.js';
 
@@ -26,6 +27,7 @@ export const createApp = (
   app.use(express.json());
 
   app.use('/health', healthRouter);
+  app.use('/models', modelsRouter);
   app.use('/assistant', createAssistantRouter(assistantDependencies));
 
   app.use(errorHandler);
