@@ -1,4 +1,4 @@
-import type { AIProvider } from '@abapilot/core';
+import { ModelCatalog, type AIProvider } from '@abapilot/core';
 
 import { OllamaAIProvider } from './ollama-ai-provider.js';
 import { loadOllamaConfig } from './ollama-config.js';
@@ -15,8 +15,14 @@ export const createAIProvider = (environment: Environment = process.env): AIProv
 
     case 'ollama': {
       const config = loadOllamaConfig(environment);
+      const modelCatalog = new ModelCatalog();
+      const modelDefinition = modelCatalog.getById(modelCatalog.getDefaultModelId());
 
-      return new OllamaAIProvider(config, config.model, 'snippets');
+      return new OllamaAIProvider(
+        config,
+        modelDefinition.providerModel,
+        modelDefinition.codeSuggestionMode,
+      );
     }
 
     default:

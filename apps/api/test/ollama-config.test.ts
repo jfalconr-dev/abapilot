@@ -8,7 +8,6 @@ describe('loadOllamaConfig', () => {
 
     expect(config).toEqual({
       baseUrl: 'http://localhost:11434',
-      model: 'qwen2.5-coder:7b',
       timeoutMs: 120_000,
     });
   });
@@ -16,13 +15,11 @@ describe('loadOllamaConfig', () => {
   it('should read and normalize the configured values', () => {
     const config = loadOllamaConfig({
       OLLAMA_BASE_URL: 'http://ollama.local:11434///',
-      OLLAMA_MODEL: 'custom-model',
       OLLAMA_TIMEOUT_MS: '60000',
     });
 
     expect(config).toEqual({
       baseUrl: 'http://ollama.local:11434',
-      model: 'custom-model',
       timeoutMs: 60_000,
     });
   });

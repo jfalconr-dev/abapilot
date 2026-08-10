@@ -1,18 +1,15 @@
 export interface OllamaConfig {
   readonly baseUrl: string;
-  readonly model: string;
   readonly timeoutMs: number;
 }
 
 type Environment = Readonly<Record<string, string | undefined>>;
 
 const DEFAULT_BASE_URL = 'http://localhost:11434';
-const DEFAULT_MODEL = 'qwen2.5-coder:7b';
 const DEFAULT_TIMEOUT_MS = 120_000;
 
 export const loadOllamaConfig = (environment: Environment = process.env): OllamaConfig => {
   const baseUrl = environment.OLLAMA_BASE_URL?.trim() || DEFAULT_BASE_URL;
-  const model = environment.OLLAMA_MODEL?.trim() || DEFAULT_MODEL;
   const timeoutValue = environment.OLLAMA_TIMEOUT_MS?.trim() || String(DEFAULT_TIMEOUT_MS);
 
   validateBaseUrl(baseUrl);
@@ -25,7 +22,6 @@ export const loadOllamaConfig = (environment: Environment = process.env): Ollama
 
   return {
     baseUrl: removeTrailingSlashes(baseUrl),
-    model,
     timeoutMs,
   };
 };

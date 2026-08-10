@@ -23,7 +23,6 @@ describe('createAIProvider', () => {
     const provider = createAIProvider({
       AI_PROVIDER: 'OLLAMA',
       OLLAMA_BASE_URL: 'http://ollama.local:11434',
-      OLLAMA_MODEL: 'custom-model',
       OLLAMA_TIMEOUT_MS: '60000',
     });
 
