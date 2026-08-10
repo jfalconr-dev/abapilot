@@ -1,11 +1,31 @@
-import { AnswerQueryUseCase, ExplainAbapCodeUseCase, ReviewAbapCodeUseCase } from '@abapilot/core';
+import {
+  AnswerQueryUseCase,
+  ExplainAbapCodeUseCase,
+  ModelCatalog,
+  ReviewAbapCodeUseCase,
+  type AIProvider,
+} from '@abapilot/core';
 
-import { createAIProvider } from '../infrastructure/ai/index.js';
+import { createAIProviderResolver } from '../infrastructure/ai/index.js';
 
-const aiProvider = createAIProvider();
+export interface AssistantApplication {
+  readonly answerQueryUseCase: AnswerQueryUseCase;
+  readonly explainAbapCodeUseCase: ExplainAbapCodeUseCase;
+  readonly reviewAbapCodeUseCase: ReviewAbapCodeUseCase;
+}
 
-export const answerQueryUseCase = new AnswerQueryUseCase(aiProvider);
+export const createAssistantApplication = (aiProvider: AIProvider): AssistantApplication => ({
+  answerQueryUseCase: new AnswerQueryUseCase(aiProvider),
+  explainAbapCodeUseCase: new ExplainAbapCodeUseCase(aiProvider),
+  reviewAbapCodeUseCase: new ReviewAbapCodeUseCase(aiProvider),
+});
 
-export const explainAbapCodeUseCase = new ExplainAbapCodeUseCase(aiProvider);
+const modelCatalog = new ModelCatalog();
+const aiProviderResolver = createAIProviderResolver();
 
-export const reviewAbapCodeUseCase = new ReviewAbapCodeUseCase(aiProvider);
+const defaultModelDefinition = modelCatalog.getById(modelCatalog.getDefaultModelId());
+
+const aiProvider = aiProviderResolver.resolve(defaultModelDefinition);
+
+export const { answerQueryUseCase, explainAbapCodeUseCase, reviewAbapCodeUseCase } =
+  createAssistantApplication(aiProvider);

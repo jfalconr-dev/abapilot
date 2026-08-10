@@ -1,15 +1,32 @@
 import express, { type Express } from 'express';
 
+import {
+  answerQueryUseCase,
+  explainAbapCodeUseCase,
+  reviewAbapCodeUseCase,
+} from './application/index.js';
 import { errorHandler } from './presentation/error-handler.js';
-import { assistantRouter, healthRouter } from './presentation/index.js';
+import {
+  createAssistantRouter,
+  healthRouter,
+  type AssistantRouterDependencies,
+} from './presentation/index.js';
 
-export const createApp = (): Express => {
+const defaultAssistantDependencies: AssistantRouterDependencies = {
+  answerQueryUseCase,
+  explainAbapCodeUseCase,
+  reviewAbapCodeUseCase,
+};
+
+export const createApp = (
+  assistantDependencies: AssistantRouterDependencies = defaultAssistantDependencies,
+): Express => {
   const app = express();
 
   app.use(express.json());
 
   app.use('/health', healthRouter);
-  app.use('/assistant', assistantRouter);
+  app.use('/assistant', createAssistantRouter(assistantDependencies));
 
   app.use(errorHandler);
 

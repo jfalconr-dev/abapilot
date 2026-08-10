@@ -1,13 +1,13 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
-import { createApp } from '../src/app.js';
+import { createTestApp } from './test-app.js';
 
 describe('POST /assistant/explain', () => {
   it('returns the exact JSON response for valid ABAP code', async () => {
     const code = 'SELECT * FROM mara INTO TABLE lt_mara.';
 
-    const response = await request(createApp()).post('/assistant/explain').send({ code });
+    const response = await request(createTestApp()).post('/assistant/explain').send({ code });
 
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toContain('application/json');
@@ -17,7 +17,7 @@ describe('POST /assistant/explain', () => {
   });
 
   it('trims the code and context', async () => {
-    const response = await request(createApp()).post('/assistant/explain').send({
+    const response = await request(createTestApp()).post('/assistant/explain').send({
       code: '  SELECT * FROM mara INTO TABLE lt_mara.  ',
       context: '  El código se ejecuta en SAP ECC.  ',
     });
@@ -38,7 +38,7 @@ describe('POST /assistant/explain', () => {
     ['object', {}],
     ['array', []],
   ])('returns status 400 when the code is %s', async (_description, code) => {
-    const response = await request(createApp()).post('/assistant/explain').send({ code });
+    const response = await request(createTestApp()).post('/assistant/explain').send({ code });
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
@@ -47,7 +47,7 @@ describe('POST /assistant/explain', () => {
   });
 
   it('returns status 400 when the code is missing', async () => {
-    const response = await request(createApp()).post('/assistant/explain').send({});
+    const response = await request(createTestApp()).post('/assistant/explain').send({});
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
@@ -65,7 +65,9 @@ describe('POST /assistant/explain', () => {
   ])('ignores the context when it is %s', async (_description, context) => {
     const code = 'SELECT * FROM mara INTO TABLE lt_mara.';
 
-    const response = await request(createApp()).post('/assistant/explain').send({ code, context });
+    const response = await request(createTestApp())
+      .post('/assistant/explain')
+      .send({ code, context });
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { explainAbapCodeUseCase } from '../src/application/index.js';
+import { createAssistantApplication } from '../src/application/index.js';
+import { StaticAIProvider } from '../src/infrastructure/ai/static-ai-provider.js';
 
 describe('explain ABAP code application composition', () => {
   it('explains ABAP code using the configured AI provider', async () => {
@@ -11,6 +12,8 @@ describe('explain ABAP code application composition', () => {
     const context = {
       content: 'El código se ejecuta en SAP ECC.',
     };
+
+    const { explainAbapCodeUseCase } = createAssistantApplication(new StaticAIProvider());
 
     const response = await explainAbapCodeUseCase.execute(code, context);
 

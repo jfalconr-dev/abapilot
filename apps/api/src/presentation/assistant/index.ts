@@ -1,1 +1,3 @@
-export { assistantRouter } from './routes.js';
+export { createAssistantRouter } from './routes.js';
+
+export type { AssistantRouterDependencies } from './routes.js';

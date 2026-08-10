@@ -1,13 +1,13 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
-import { createApp } from '../src/app.js';
+import { createTestApp } from './test-app.js';
 
 describe('POST /assistant/query', () => {
   it('returns the exact JSON response for a valid query', async () => {
     const query = '¿Cómo puedo analizar un dump ABAP?';
 
-    const response = await request(createApp()).post('/assistant/query').send({ query });
+    const response = await request(createTestApp()).post('/assistant/query').send({ query });
 
     expect(response.status).toBe(200);
     expect(response.headers['content-type']).toContain('application/json');
@@ -17,7 +17,7 @@ describe('POST /assistant/query', () => {
   });
 
   it('trims the query and context', async () => {
-    const response = await request(createApp()).post('/assistant/query').send({
+    const response = await request(createTestApp()).post('/assistant/query').send({
       query: '  ¿Cómo puedo analizar un dump ABAP?  ',
       context: '  El dump se ha producido en un proceso de fondo.  ',
     });
@@ -38,7 +38,7 @@ describe('POST /assistant/query', () => {
     ['object', {}],
     ['array', []],
   ])('returns status 400 when the query is %s', async (_description, query) => {
-    const response = await request(createApp()).post('/assistant/query').send({ query });
+    const response = await request(createTestApp()).post('/assistant/query').send({ query });
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
@@ -47,7 +47,7 @@ describe('POST /assistant/query', () => {
   });
 
   it('returns status 400 when the query is missing', async () => {
-    const response = await request(createApp()).post('/assistant/query').send({});
+    const response = await request(createTestApp()).post('/assistant/query').send({});
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
@@ -65,7 +65,9 @@ describe('POST /assistant/query', () => {
   ])('ignores the context when it is %s', async (_description, context) => {
     const query = '¿Cómo puedo analizar un dump ABAP?';
 
-    const response = await request(createApp()).post('/assistant/query').send({ query, context });
+    const response = await request(createTestApp())
+      .post('/assistant/query')
+      .send({ query, context });
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({

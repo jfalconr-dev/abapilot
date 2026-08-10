@@ -1,22 +1,30 @@
-import { Router } from 'express';
+import type {
+  AnswerQueryUseCase,
+  ExplainAbapCodeUseCase,
+  ReviewAbapCodeUseCase,
+} from '@abapilot/core';
+import { Router, type Router as ExpressRouter } from 'express';
 
-import {
-  answerQueryUseCase,
-  explainAbapCodeUseCase,
-  reviewAbapCodeUseCase,
-} from '../../application/index.js';
 import { AssistantController } from './controller.js';
 
-const router = Router();
+export interface AssistantRouterDependencies {
+  readonly answerQueryUseCase: AnswerQueryUseCase;
+  readonly explainAbapCodeUseCase: ExplainAbapCodeUseCase;
+  readonly reviewAbapCodeUseCase: ReviewAbapCodeUseCase;
+}
 
-const assistantController = new AssistantController(
-  answerQueryUseCase,
-  explainAbapCodeUseCase,
-  reviewAbapCodeUseCase,
-);
+export const createAssistantRouter = (dependencies: AssistantRouterDependencies): ExpressRouter => {
+  const router = Router();
 
-router.post('/query', assistantController.query.bind(assistantController));
-router.post('/explain', assistantController.explain.bind(assistantController));
-router.post('/review', assistantController.review.bind(assistantController));
+  const assistantController = new AssistantController(
+    dependencies.answerQueryUseCase,
+    dependencies.explainAbapCodeUseCase,
+    dependencies.reviewAbapCodeUseCase,
+  );
 
-export { router as assistantRouter };
+  router.post('/query', assistantController.query.bind(assistantController));
+  router.post('/explain', assistantController.explain.bind(assistantController));
+  router.post('/review', assistantController.review.bind(assistantController));
+
+  return router;
+};
