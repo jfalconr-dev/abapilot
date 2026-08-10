@@ -1,3 +1,11 @@
+import {
+  AIProviderResolver,
+  DEFAULT_MODEL_ID,
+  ModelCatalog,
+  type AIProvider,
+  type AbapCode,
+  type Context,
+} from '@abapilot/core';
 import { describe, expect, it } from 'vitest';
 
 import { createAssistantApplication } from '../src/application/index.js';
@@ -5,21 +13,28 @@ import { StaticAIProvider } from '../src/infrastructure/ai/static-ai-provider.js
 
 describe('explain ABAP code application composition', () => {
   it('explains ABAP code using the configured AI provider', async () => {
-    const code = {
+    const code: AbapCode = {
       content: 'SELECT * FROM mara INTO TABLE lt_mara.',
     };
 
-    const context = {
+    const context: Context = {
       content: 'El código se ejecuta en SAP ECC.',
     };
 
-    const { explainAbapCodeUseCase } = createAssistantApplication(new StaticAIProvider());
+    const modelCatalog = new ModelCatalog();
 
-    const response = await explainAbapCodeUseCase.execute(code, context);
+    const aiProviderResolver = new AIProviderResolver({
+      ollama: (): AIProvider => new StaticAIProvider(),
+    });
+
+    const { explainAbapCodeUseCase } = createAssistantApplication(modelCatalog, aiProviderResolver);
+
+    const response = await explainAbapCodeUseCase.execute(DEFAULT_MODEL_ID, code, context);
 
     expect(response).toEqual({
       content:
-        'Explicación estática para el código ABAP: SELECT * FROM mara INTO TABLE lt_mara. Contexto recibido: El código se ejecuta en SAP ECC.',
+        'Explicación estática para el código ABAP: SELECT * FROM mara INTO TABLE lt_mara.' +
+        ' Contexto recibido: El código se ejecuta en SAP ECC.',
     });
   });
 });

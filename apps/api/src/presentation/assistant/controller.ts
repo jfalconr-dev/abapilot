@@ -9,11 +9,13 @@ import type {
 import type { NextFunction, Request, Response } from 'express';
 
 interface AssistantQueryRequestBody {
+  readonly modelId?: unknown;
   readonly query?: unknown;
   readonly context?: unknown;
 }
 
 interface AssistantCodeRequestBody {
+  readonly modelId?: unknown;
   readonly code?: unknown;
   readonly context?: unknown;
 }
@@ -45,9 +47,18 @@ export class AssistantController {
     };
 
     const context = this.createContext(request.body.context);
+    const modelId = this.createModelId(request.body.modelId);
+
+    if (modelId === undefined) {
+      response.status(400).json({
+        error: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
+      });
+
+      return;
+    }
 
     try {
-      const result = await this.answerQueryUseCase.execute(query, context);
+      const result = await this.answerQueryUseCase.execute(modelId, query, context);
 
       response.status(200).json({
         response: result.content,
@@ -77,9 +88,18 @@ export class AssistantController {
     };
 
     const context = this.createContext(request.body.context);
+    const modelId = this.createModelId(request.body.modelId);
+
+    if (modelId === undefined) {
+      response.status(400).json({
+        error: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
+      });
+
+      return;
+    }
 
     try {
-      const result = await this.explainAbapCodeUseCase.execute(code, context);
+      const result = await this.explainAbapCodeUseCase.execute(modelId, code, context);
 
       response.status(200).json({
         response: result.content,
@@ -109,9 +129,18 @@ export class AssistantController {
     };
 
     const context = this.createContext(request.body.context);
+    const modelId = this.createModelId(request.body.modelId);
+
+    if (modelId === undefined) {
+      response.status(400).json({
+        error: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
+      });
+
+      return;
+    }
 
     try {
-      const result = await this.reviewAbapCodeUseCase.execute(code, context);
+      const result = await this.reviewAbapCodeUseCase.execute(modelId, code, context);
 
       response.status(200).json({
         response: result.content,
@@ -129,5 +158,13 @@ export class AssistantController {
     return {
       content: contextContent.trim(),
     };
+  }
+
+  private createModelId(modelId: unknown): string | undefined {
+    if (typeof modelId !== 'string' || modelId.trim().length === 0) {
+      return undefined;
+    }
+
+    return modelId.trim();
   }
 }

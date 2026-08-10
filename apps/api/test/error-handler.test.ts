@@ -1,3 +1,4 @@
+import { ModelNotSupportedError } from '@abapilot/core';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
@@ -23,5 +24,25 @@ describe('errorHandler', () => {
     });
     expect(response.text).not.toContain('Ollama');
     expect(response.text).not.toContain('localhost:11434');
+  });
+
+  it('returns status 400 for an unsupported model', async () => {
+    const app = express();
+
+    app.get(
+      '/unsupported-model',
+      (_request: Request, _response: Response, next: NextFunction): void => {
+        next(new ModelNotSupportedError('unsupported-model'));
+      },
+    );
+
+    app.use(errorHandler);
+
+    const response = await request(app).get('/unsupported-model');
+
+    expect(response.status).toBe(400);
+    expect(response.body).toEqual({
+      error: 'El modelo solicitado no está soportado por ABAPilot.',
+    });
   });
 });

@@ -1,11 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type { AbapCode, Context, Response } from '../src/domain/index.js';
-import type { AIProvider } from '../src/application/ports/index.js';
-import { ReviewAbapCodeUseCase } from '../src/application/use-cases/index.js';
+import {
+  AIProviderResolver,
+  ModelCatalog,
+  ReviewAbapCodeUseCase,
+  type AIProvider,
+  type AbapCode,
+  type Context,
+  type Response,
+} from '../src/index.js';
 
 describe('ReviewAbapCodeUseCase', () => {
-  it('delegates the code review to the AI provider', async () => {
+  it('resolves the model provider and delegates the code review', async () => {
     const code: AbapCode = {
       content: 'SELECT * FROM mara INTO TABLE lt_mara.',
     };
@@ -18,20 +24,26 @@ describe('ReviewAbapCodeUseCase', () => {
       content: 'La revisión identifica oportunidades de mejora.',
     };
 
-    const reviewCodeMock = vi.fn().mockResolvedValue(expectedResponse);
+    const reviewCode = vi.fn().mockResolvedValue(expectedResponse);
 
     const aiProvider: AIProvider = {
       generateResponse: vi.fn(),
       explainCode: vi.fn(),
-      reviewCode: reviewCodeMock,
+      reviewCode,
     };
 
-    const useCase = new ReviewAbapCodeUseCase(aiProvider);
+    const modelCatalog = new ModelCatalog();
 
-    const response = await useCase.execute(code, context);
+    const aiProviderResolver = new AIProviderResolver({
+      ollama: (): AIProvider => aiProvider,
+    });
 
-    expect(reviewCodeMock).toHaveBeenCalledOnce();
-    expect(reviewCodeMock).toHaveBeenCalledWith(code, context);
+    const useCase = new ReviewAbapCodeUseCase(modelCatalog, aiProviderResolver);
+
+    const response = await useCase.execute(modelCatalog.getDefaultModelId(), code, context);
+
+    expect(reviewCode).toHaveBeenCalledOnce();
+    expect(reviewCode).toHaveBeenCalledWith(code, context);
     expect(response).toEqual(expectedResponse);
   });
 });

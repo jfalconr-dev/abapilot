@@ -1,35 +1,49 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type { AbapCode, Context, Response } from '../src/domain/index.js';
-import type { AIProvider } from '../src/application/ports/index.js';
-import { ExplainAbapCodeUseCase } from '../src/application/use-cases/index.js';
+import {
+  AIProviderResolver,
+  ExplainAbapCodeUseCase,
+  ModelCatalog,
+  type AIProvider,
+  type AbapCode,
+  type Context,
+  type Response,
+} from '../src/index.js';
 
 describe('ExplainAbapCodeUseCase', () => {
-  it('delegates the code explanation to the AI provider', async () => {
+  it('resolves the model provider and delegates the code explanation', async () => {
     const code: AbapCode = {
       content: 'SELECT * FROM mara INTO TABLE lt_mara.',
     };
+
     const context: Context = {
       content: 'El código se ejecuta en SAP ECC.',
     };
+
     const expectedResponse: Response = {
       content: 'El código recupera registros de la tabla MARA.',
     };
 
-    const explainCodeMock = vi.fn().mockResolvedValue(expectedResponse);
+    const explainCode = vi.fn().mockResolvedValue(expectedResponse);
 
     const aiProvider: AIProvider = {
       generateResponse: vi.fn(),
-      explainCode: explainCodeMock,
+      explainCode,
       reviewCode: vi.fn(),
     };
 
-    const useCase = new ExplainAbapCodeUseCase(aiProvider);
+    const modelCatalog = new ModelCatalog();
 
-    const response = await useCase.execute(code, context);
+    const aiProviderResolver = new AIProviderResolver({
+      ollama: (): AIProvider => aiProvider,
+    });
 
-    expect(explainCodeMock).toHaveBeenCalledOnce();
-    expect(explainCodeMock).toHaveBeenCalledWith(code, context);
+    const useCase = new ExplainAbapCodeUseCase(modelCatalog, aiProviderResolver);
+
+    const response = await useCase.execute(modelCatalog.getDefaultModelId(), code, context);
+
+    expect(explainCode).toHaveBeenCalledOnce();
+    expect(explainCode).toHaveBeenCalledWith(code, context);
     expect(response).toEqual(expectedResponse);
   });
 });

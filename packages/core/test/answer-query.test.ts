@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  AIProviderResolver,
   AnswerQueryUseCase,
+  ModelCatalog,
   type AIProvider,
   type Context,
   type Query,
@@ -9,7 +11,7 @@ import {
 } from '../src/index.js';
 
 describe('AnswerQueryUseCase', () => {
-  it('delegates the query and context to the AI provider', async () => {
+  it('resolves the model provider and delegates the query and context', async () => {
     const query: Query = {
       content: '¿Cómo puedo implementar una BAdI en SAP ECC?',
     };
@@ -30,9 +32,15 @@ describe('AnswerQueryUseCase', () => {
       reviewCode: vi.fn(),
     };
 
-    const useCase = new AnswerQueryUseCase(aiProvider);
+    const modelCatalog = new ModelCatalog();
 
-    const response = await useCase.execute(query, context);
+    const aiProviderResolver = new AIProviderResolver({
+      ollama: (): AIProvider => aiProvider,
+    });
+
+    const useCase = new AnswerQueryUseCase(modelCatalog, aiProviderResolver);
+
+    const response = await useCase.execute(modelCatalog.getDefaultModelId(), query, context);
 
     expect(generateResponse).toHaveBeenCalledOnce();
     expect(generateResponse).toHaveBeenCalledWith(query, context);
