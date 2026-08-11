@@ -1,8 +1,28 @@
-import { DEFAULT_MODEL_ID } from '@abapilot/core';
+import { DEFAULT_MODEL_ID, ModelCatalog } from '@abapilot/core';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
+import { PROFESSIONAL_VALIDATION } from '../src/presentation/assistant/professional-validation.js';
 import { createTestApp } from './test-app.js';
+
+const modelCatalog = new ModelCatalog();
+const defaultModel = modelCatalog.getById(DEFAULT_MODEL_ID);
+
+const expectedMetadata = {
+  modelId: DEFAULT_MODEL_ID,
+  codeSuggestionMode: defaultModel.codeSuggestionMode,
+  validation: PROFESSIONAL_VALIDATION,
+};
+
+interface AssistantSuccessResponseBody {
+  readonly response: string;
+  readonly modelId: string;
+  readonly codeSuggestionMode: 'none' | 'snippets' | 'full';
+  readonly validation: {
+    readonly title: string;
+    readonly message: string;
+  };
+}
 
 describe('POST /assistant/query', () => {
   it('returns the exact JSON response for a valid query', async () => {
@@ -17,6 +37,7 @@ describe('POST /assistant/query', () => {
     expect(response.headers['content-type']).toContain('application/json');
     expect(response.body).toEqual({
       response: `Respuesta estática para la consulta: ${query}`,
+      ...expectedMetadata,
     });
   });
 
@@ -34,6 +55,7 @@ describe('POST /assistant/query', () => {
       response:
         'Respuesta estática para la consulta: ¿Cómo puedo analizar un dump ABAP?' +
         ' Contexto recibido: El dump se ha producido en un proceso de fondo.',
+      ...expectedMetadata,
     });
   });
 
@@ -86,6 +108,7 @@ describe('POST /assistant/query', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       response: `Respuesta estática para la consulta: ${query}`,
+      ...expectedMetadata,
     });
   });
 
@@ -122,5 +145,24 @@ describe('POST /assistant/query', () => {
     expect(response.body).toEqual({
       error: 'El modelo solicitado no está soportado por ABAPilot.',
     });
+  });
+
+  it('includes the professional validation warning in successful responses', async () => {
+    const response = await request(createTestApp()).post('/assistant/query').send({
+      modelId: DEFAULT_MODEL_ID,
+      query: '¿Cómo puedo generar un albarán a partir de un pedido?',
+    });
+
+    expect(response.status).toBe(200);
+
+    const responseBody = response.body as AssistantSuccessResponseBody;
+
+    expect(responseBody.validation.title).toBe('Validación profesional requerida');
+
+    expect(responseBody.validation.message).toContain(
+      'No incorpores código ni ejecutes acciones propuestas directamente en entornos productivos',
+    );
+
+    expect(responseBody.validation.message).toContain('sin una revisión técnica previa.');
   });
 });

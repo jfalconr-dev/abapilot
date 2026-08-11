@@ -1,6 +1,7 @@
 import type {
   AnswerQueryUseCase,
   ExplainAbapCodeUseCase,
+  ModelCatalog,
   ReviewAbapCodeUseCase,
 } from '@abapilot/core';
 import { Router, type Router as ExpressRouter } from 'express';
@@ -8,6 +9,7 @@ import { Router, type Router as ExpressRouter } from 'express';
 import { AssistantController } from './controller.js';
 
 export interface AssistantRouterDependencies {
+  readonly modelCatalog: ModelCatalog;
   readonly answerQueryUseCase: AnswerQueryUseCase;
   readonly explainAbapCodeUseCase: ExplainAbapCodeUseCase;
   readonly reviewAbapCodeUseCase: ReviewAbapCodeUseCase;
@@ -17,6 +19,7 @@ export const createAssistantRouter = (dependencies: AssistantRouterDependencies)
   const router = Router();
 
   const assistantController = new AssistantController(
+    dependencies.modelCatalog,
     dependencies.answerQueryUseCase,
     dependencies.explainAbapCodeUseCase,
     dependencies.reviewAbapCodeUseCase,

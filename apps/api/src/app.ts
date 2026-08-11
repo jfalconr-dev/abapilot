@@ -3,6 +3,7 @@ import express, { type Express } from 'express';
 import {
   answerQueryUseCase,
   explainAbapCodeUseCase,
+  modelCatalog,
   reviewAbapCodeUseCase,
 } from './application/index.js';
 import { errorHandler } from './presentation/error-handler.js';
@@ -14,6 +15,7 @@ import {
 } from './presentation/index.js';
 
 const defaultAssistantDependencies: AssistantRouterDependencies = {
+  modelCatalog,
   answerQueryUseCase,
   explainAbapCodeUseCase,
   reviewAbapCodeUseCase,

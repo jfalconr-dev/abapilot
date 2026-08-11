@@ -2,6 +2,7 @@ export {
   answerQueryUseCase,
   createAssistantApplication,
   explainAbapCodeUseCase,
+  modelCatalog,
   reviewAbapCodeUseCase,
 } from './assistant-application.js';
 

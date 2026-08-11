@@ -1,8 +1,18 @@
-import { DEFAULT_MODEL_ID } from '@abapilot/core';
+import { DEFAULT_MODEL_ID, ModelCatalog } from '@abapilot/core';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
+import { PROFESSIONAL_VALIDATION } from '../src/presentation/assistant/professional-validation.js';
 import { createTestApp } from './test-app.js';
+
+const modelCatalog = new ModelCatalog();
+const defaultModel = modelCatalog.getById(DEFAULT_MODEL_ID);
+
+const expectedMetadata = {
+  modelId: DEFAULT_MODEL_ID,
+  codeSuggestionMode: defaultModel.codeSuggestionMode,
+  validation: PROFESSIONAL_VALIDATION,
+};
 
 describe('POST /assistant/review', () => {
   it('returns the exact JSON response for valid ABAP code', async () => {
@@ -17,6 +27,7 @@ describe('POST /assistant/review', () => {
     expect(response.headers['content-type']).toContain('application/json');
     expect(response.body).toEqual({
       response: `Revisión estática para el código ABAP: ${code}`,
+      ...expectedMetadata,
     });
   });
 
@@ -34,6 +45,7 @@ describe('POST /assistant/review', () => {
       response:
         'Revisión estática para el código ABAP: SELECT * FROM mara INTO TABLE lt_mara.' +
         ' Contexto recibido: El código se ejecuta en SAP ECC.',
+      ...expectedMetadata,
     });
   });
 
@@ -86,6 +98,7 @@ describe('POST /assistant/review', () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       response: `Revisión estática para el código ABAP: ${code}`,
+      ...expectedMetadata,
     });
   });
 

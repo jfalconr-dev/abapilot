@@ -3,10 +3,14 @@ import type {
   AnswerQueryUseCase,
   Context,
   ExplainAbapCodeUseCase,
+  ModelCatalog,
   Query,
+  Response as AssistantResult,
   ReviewAbapCodeUseCase,
 } from '@abapilot/core';
 import type { NextFunction, Request, Response } from 'express';
+
+import { PROFESSIONAL_VALIDATION } from './professional-validation.js';
 
 interface AssistantQueryRequestBody {
   readonly modelId?: unknown;
@@ -22,6 +26,7 @@ interface AssistantCodeRequestBody {
 
 export class AssistantController {
   public constructor(
+    private readonly modelCatalog: ModelCatalog,
     private readonly answerQueryUseCase: AnswerQueryUseCase,
     private readonly explainAbapCodeUseCase: ExplainAbapCodeUseCase,
     private readonly reviewAbapCodeUseCase: ReviewAbapCodeUseCase,
@@ -60,9 +65,7 @@ export class AssistantController {
     try {
       const result = await this.answerQueryUseCase.execute(modelId, query, context);
 
-      response.status(200).json({
-        response: result.content,
-      });
+      response.status(200).json(this.createSuccessResponse(modelId, result));
     } catch (error: unknown) {
       next(error);
     }
@@ -101,9 +104,7 @@ export class AssistantController {
     try {
       const result = await this.explainAbapCodeUseCase.execute(modelId, code, context);
 
-      response.status(200).json({
-        response: result.content,
-      });
+      response.status(200).json(this.createSuccessResponse(modelId, result));
     } catch (error: unknown) {
       next(error);
     }
@@ -142,9 +143,7 @@ export class AssistantController {
     try {
       const result = await this.reviewAbapCodeUseCase.execute(modelId, code, context);
 
-      response.status(200).json({
-        response: result.content,
-      });
+      response.status(200).json(this.createSuccessResponse(modelId, result));
     } catch (error: unknown) {
       next(error);
     }
@@ -166,5 +165,27 @@ export class AssistantController {
     }
 
     return modelId.trim();
+  }
+
+  private createSuccessResponse(
+    modelId: string,
+    result: AssistantResult,
+  ): {
+    readonly response: string;
+    readonly modelId: string;
+    readonly codeSuggestionMode: 'none' | 'snippets' | 'full';
+    readonly validation: {
+      readonly title: string;
+      readonly message: string;
+    };
+  } {
+    const modelDefinition = this.modelCatalog.getById(modelId);
+
+    return {
+      response: result.content,
+      modelId: modelDefinition.id,
+      codeSuggestionMode: modelDefinition.codeSuggestionMode,
+      validation: PROFESSIONAL_VALIDATION,
+    };
   }
 }
