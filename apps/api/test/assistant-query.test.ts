@@ -74,7 +74,8 @@ describe('POST /assistant/query', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'El campo query es obligatorio y debe contener texto.',
+      code: 'INVALID_REQUEST',
+      message: 'El campo query es obligatorio y debe contener texto.',
     });
   });
 
@@ -85,7 +86,8 @@ describe('POST /assistant/query', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'El campo query es obligatorio y debe contener texto.',
+      code: 'INVALID_REQUEST',
+      message: 'El campo query es obligatorio y debe contener texto.',
     });
   });
 
@@ -120,7 +122,8 @@ describe('POST /assistant/query', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
+      code: 'INVALID_REQUEST',
+      message: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
     });
   });
 
@@ -131,7 +134,8 @@ describe('POST /assistant/query', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
+      code: 'INVALID_REQUEST',
+      message: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
     });
   });
 
@@ -143,7 +147,8 @@ describe('POST /assistant/query', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'El modelo solicitado no está soportado por ABAPilot.',
+      code: 'MODEL_NOT_SUPPORTED',
+      message: 'El modelo solicitado no está soportado por ABAPilot.',
     });
   });
 

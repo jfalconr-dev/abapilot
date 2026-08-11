@@ -7,6 +7,7 @@ import type {
   Response,
 } from '@abapilot/core';
 
+import { AIProviderTimeoutError, AIProviderUnavailableError } from './ai-provider-error.js';
 import { buildLlmPrompt, type LlmPrompt } from './llm-prompt-policy.js';
 import type { OllamaConfig } from './ollama-config.js';
 
@@ -58,25 +59,35 @@ export class OllamaAIProvider implements AIProvider {
   }
 
   private async generate(llmPrompt: LlmPrompt): Promise<Response> {
-    const httpResponse = await this.fetchClient(`${this.config.baseUrl}/api/generate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: this.providerModel,
-        system: llmPrompt.system,
-        prompt: llmPrompt.prompt,
-        stream: false,
-        options: {
-          temperature: 0.2,
+    let httpResponse: globalThis.Response;
+
+    try {
+      httpResponse = await this.fetchClient(`${this.config.baseUrl}/api/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      }),
-      signal: AbortSignal.timeout(this.config.timeoutMs),
-    });
+        body: JSON.stringify({
+          model: this.providerModel,
+          system: llmPrompt.system,
+          prompt: llmPrompt.prompt,
+          stream: false,
+          options: {
+            temperature: 0.2,
+          },
+        }),
+        signal: AbortSignal.timeout(this.config.timeoutMs),
+      });
+    } catch (error: unknown) {
+      if (isTimeoutError(error)) {
+        throw new AIProviderTimeoutError();
+      }
+
+      throw new AIProviderUnavailableError();
+    }
 
     if (!httpResponse.ok) {
-      throw new Error(`Ollama ha respondido con el estado HTTP ${httpResponse.status}.`);
+      throw new AIProviderUnavailableError();
     }
 
     const responseBody: unknown = await httpResponse.json();
@@ -96,3 +107,6 @@ const isOllamaGenerateResponse = (value: unknown): value is OllamaGenerateRespon
   value !== null &&
   'response' in value &&
   typeof value.response === 'string';
+
+const isTimeoutError = (error: unknown): boolean =>
+  error instanceof DOMException && error.name === 'TimeoutError';

@@ -1,10 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import {
+  AIProviderTimeoutError,
+  AIProviderUnavailableError,
+} from '../src/infrastructure/ai/ai-provider-error.js';
 import { OllamaAIProvider } from '../src/infrastructure/ai/ollama-ai-provider.js';
 
 const config = {
   baseUrl: 'http://localhost:11434',
-  model: 'qwen2.5-coder:7b',
   timeoutMs: 120_000,
 };
 
@@ -26,6 +29,7 @@ describe('OllamaAIProvider', () => {
         },
       ),
     );
+
     const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
 
     const response = await provider.generateResponse(
@@ -40,6 +44,7 @@ describe('OllamaAIProvider', () => {
     expect(response).toEqual({
       content: 'Puede implementar la BAdI utilizando la transacción SE19.',
     });
+
     expect(fetchClient).toHaveBeenCalledOnce();
     expect(fetchClient).toHaveBeenCalledWith(
       'http://localhost:11434/api/generate',
@@ -75,6 +80,7 @@ describe('OllamaAIProvider', () => {
         temperature: 0.2,
       },
     });
+
     const requestOptions = fetchClient.mock.calls[0]?.[1];
 
     expect(requestOptions?.signal).toBeInstanceOf(AbortSignal);
@@ -82,6 +88,7 @@ describe('OllamaAIProvider', () => {
 
   it('should use the ABAP explanation instruction', async () => {
     const fetchClient = createSuccessfulFetch('El código declara una variable.');
+
     const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
 
     await provider.explainCode({
@@ -96,6 +103,7 @@ describe('OllamaAIProvider', () => {
 
   it('should use the ABAP review instruction', async () => {
     const fetchClient = createSuccessfulFetch('La revisión no identifica errores.');
+
     const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
 
     await provider.reviewCode({
@@ -109,20 +117,50 @@ describe('OllamaAIProvider', () => {
     ]);
   });
 
-  it('should reject an unsuccessful HTTP response', async () => {
+  it('should classify an unsuccessful HTTP response as provider unavailable', async () => {
     const fetchClient = vi
       .fn<typeof fetch>()
       .mockResolvedValue(new Response(null, { status: 500 }));
+
     const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
 
     await expect(
       provider.generateResponse({
         content: 'Consulta de prueba.',
       }),
-    ).rejects.toThrow('Ollama ha respondido con el estado HTTP 500.');
+    ).rejects.toBeInstanceOf(AIProviderUnavailableError);
   });
 
-  it('should reject an invalid response body', async () => {
+  it('should classify a connection failure as provider unavailable', async () => {
+    const fetchClient = vi.fn<typeof fetch>().mockRejectedValue(new TypeError('fetch failed'));
+
+    const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
+
+    await expect(
+      provider.generateResponse({
+        content: 'Consulta de prueba.',
+      }),
+    ).rejects.toBeInstanceOf(AIProviderUnavailableError);
+  });
+
+  it('should classify a timeout as provider timeout', async () => {
+    const timeoutError = new DOMException(
+      'The operation was aborted due to timeout',
+      'TimeoutError',
+    );
+
+    const fetchClient = vi.fn<typeof fetch>().mockRejectedValue(timeoutError);
+
+    const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
+
+    await expect(
+      provider.generateResponse({
+        content: 'Consulta de prueba.',
+      }),
+    ).rejects.toBeInstanceOf(AIProviderTimeoutError);
+  });
+
+  it('should reject an invalid response body as an internal provider error', async () => {
     const fetchClient = vi.fn<typeof fetch>().mockResolvedValue(
       new Response(JSON.stringify({ unexpected: 'value' }), {
         status: 200,
@@ -131,6 +169,7 @@ describe('OllamaAIProvider', () => {
         },
       }),
     );
+
     const provider = new OllamaAIProvider(config, providerModel, codeSuggestionMode, fetchClient);
 
     await expect(

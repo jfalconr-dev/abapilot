@@ -64,7 +64,8 @@ describe('POST /assistant/review', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'El campo code es obligatorio y debe contener código ABAP.',
+      code: 'INVALID_REQUEST',
+      message: 'El campo code es obligatorio y debe contener código ABAP.',
     });
   });
 
@@ -75,7 +76,8 @@ describe('POST /assistant/review', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'El campo code es obligatorio y debe contener código ABAP.',
+      code: 'INVALID_REQUEST',
+      message: 'El campo code es obligatorio y debe contener código ABAP.',
     });
   });
 
@@ -110,7 +112,8 @@ describe('POST /assistant/review', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
+      code: 'INVALID_REQUEST',
+      message: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
     });
   });
 
@@ -121,7 +124,8 @@ describe('POST /assistant/review', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
+      code: 'INVALID_REQUEST',
+      message: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
     });
   });
 
@@ -133,7 +137,8 @@ describe('POST /assistant/review', () => {
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
-      error: 'El modelo solicitado no está soportado por ABAPilot.',
+      code: 'MODEL_NOT_SUPPORTED',
+      message: 'El modelo solicitado no está soportado por ABAPilot.',
     });
   });
 });

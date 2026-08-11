@@ -41,7 +41,8 @@ export class AssistantController {
 
     if (typeof queryContent !== 'string' || queryContent.trim().length === 0) {
       response.status(400).json({
-        error: 'El campo query es obligatorio y debe contener texto.',
+        code: 'INVALID_REQUEST',
+        message: 'El campo query es obligatorio y debe contener texto.',
       });
 
       return;
@@ -56,7 +57,8 @@ export class AssistantController {
 
     if (modelId === undefined) {
       response.status(400).json({
-        error: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
+        code: 'INVALID_REQUEST',
+        message: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
       });
 
       return;
@@ -80,7 +82,8 @@ export class AssistantController {
 
     if (typeof codeContent !== 'string' || codeContent.trim().length === 0) {
       response.status(400).json({
-        error: 'El campo code es obligatorio y debe contener código ABAP.',
+        code: 'INVALID_REQUEST',
+        message: 'El campo code es obligatorio y debe contener código ABAP.',
       });
 
       return;
@@ -95,7 +98,8 @@ export class AssistantController {
 
     if (modelId === undefined) {
       response.status(400).json({
-        error: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
+        code: 'INVALID_REQUEST',
+        message: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
       });
 
       return;
@@ -119,7 +123,8 @@ export class AssistantController {
 
     if (typeof codeContent !== 'string' || codeContent.trim().length === 0) {
       response.status(400).json({
-        error: 'El campo code es obligatorio y debe contener código ABAP.',
+        code: 'INVALID_REQUEST',
+        message: 'El campo code es obligatorio y debe contener código ABAP.',
       });
 
       return;
@@ -134,7 +139,8 @@ export class AssistantController {
 
     if (modelId === undefined) {
       response.status(400).json({
-        error: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
+        code: 'INVALID_REQUEST',
+        message: 'El campo modelId es obligatorio y debe contener un identificador de modelo.',
       });
 
       return;
