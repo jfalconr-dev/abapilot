@@ -1,7 +1,12 @@
 import './styles.css';
 
-type Operation = 'query' | 'explain' | 'review';
-type CodeSuggestionMode = 'none' | 'snippets' | 'full';
+import {
+  CODE_SUGGESTION_LABELS,
+  OPERATION_DEFINITIONS,
+  parseAssistantContent,
+  type CodeSuggestionMode,
+  type Operation,
+} from './assistant-ui.js';
 
 interface PublicModel {
   readonly id: string;
@@ -26,48 +31,9 @@ interface AssistantResponse {
 }
 
 interface AssistantErrorResponse {
-  readonly error: string;
+  readonly code: string;
+  readonly message: string;
 }
-
-interface OperationDefinition {
-  readonly endpoint: string;
-  readonly fieldName: 'query' | 'code';
-  readonly inputLabel: string;
-  readonly placeholder: string;
-  readonly initialMessage: string;
-}
-
-const OPERATION_DEFINITIONS: Readonly<Record<Operation, OperationDefinition>> = {
-  query: {
-    endpoint: '/assistant/query',
-    fieldName: 'query',
-    inputLabel: 'Consulta',
-    placeholder: 'Escribe una consulta sobre SAP ECC o desarrollo ABAP...',
-    initialMessage: 'Introduce una consulta y pulsa Ejecutar.',
-  },
-  explain: {
-    endpoint: '/assistant/explain',
-    fieldName: 'code',
-    inputLabel: 'Código ABAP',
-    placeholder: 'Pega el código ABAP del que quieres obtener una explicación...',
-    initialMessage: 'Introduce código ABAP y pulsa Ejecutar para obtener una explicación.',
-  },
-  review: {
-    endpoint: '/assistant/review',
-    fieldName: 'code',
-    inputLabel: 'Código ABAP',
-    placeholder: 'Pega el código ABAP del que quieres obtener una revisión...',
-    initialMessage: 'Introduce código ABAP y pulsa Ejecutar para obtener una revisión.',
-  },
-};
-
-const CODE_SUGGESTION_LABELS: Readonly<Record<CodeSuggestionMode, string>> = {
-  none: 'No disponibles',
-  snippets: 'Fragmentos',
-  full: 'Completas',
-};
-
-const CODE_BLOCK_PATTERN = /```([^\r\n`]*)\r?\n([\s\S]*?)```/g;
 
 const appElement = document.querySelector<HTMLDivElement>('#app');
 
@@ -276,16 +242,10 @@ let hasCustomResult = false;
 let availableModels: readonly PublicModel[] = [];
 
 const appendTextBlock = (content: string): void => {
-  const normalizedContent = content.trim();
-
-  if (normalizedContent.length === 0) {
-    return;
-  }
-
   const paragraph = document.createElement('p');
 
   paragraph.className = 'result-text';
-  paragraph.textContent = normalizedContent;
+  paragraph.textContent = content;
 
   resultContent.append(paragraph);
 };
@@ -337,6 +297,10 @@ const appendCodeBlock = (language: string, codeContent: string): void => {
     void copyCode();
   });
 
+  /*
+   * El contenido generado por el LLM se trata siempre como texto no
+   * confiable. Nunca se interpreta como HTML ni se ejecuta.
+   */
   code.textContent = normalizedCode;
 
   pre.append(code);
@@ -348,24 +312,16 @@ const appendCodeBlock = (language: string, codeContent: string): void => {
 const renderAssistantResponse = (content: string): void => {
   resultContent.replaceChildren();
 
-  CODE_BLOCK_PATTERN.lastIndex = 0;
+  const segments = parseAssistantContent(content);
 
-  let lastIndex = 0;
-
-  for (const match of content.matchAll(CODE_BLOCK_PATTERN)) {
-    const matchIndex = match.index;
-
-    if (matchIndex === undefined) {
+  for (const segment of segments) {
+    if (segment.type === 'text') {
+      appendTextBlock(segment.content);
       continue;
     }
 
-    appendTextBlock(content.slice(lastIndex, matchIndex));
-    appendCodeBlock(match[1] ?? '', match[2] ?? '');
-
-    lastIndex = matchIndex + match[0].length;
+    appendCodeBlock(segment.language, segment.content);
   }
-
-  appendTextBlock(content.slice(lastIndex));
 
   if (resultContent.childElementCount === 0) {
     appendTextBlock(content);
@@ -385,9 +341,11 @@ const showValidationNotice = (assistantResponse: AssistantResponse): void => {
   const responseModel = availableModels.find((model) => model.id === assistantResponse.modelId);
 
   const modelLabel = responseModel?.displayName ?? assistantResponse.modelId;
+
   const codeSuggestionLabel = CODE_SUGGESTION_LABELS[assistantResponse.codeSuggestionMode];
 
   validationNoticeTitle.textContent = assistantResponse.validation.title;
+
   validationNoticeText.textContent = assistantResponse.validation.message;
 
   responseMetadata.textContent =
@@ -447,6 +405,7 @@ const updateInteractionState = (): void => {
   clearButton.disabled = !canClear;
 
   modelSelect.disabled = !modelsAvailable || requestInProgress;
+
   assistantInput.disabled = requestInProgress;
   contextInput.disabled = requestInProgress;
 
@@ -472,6 +431,7 @@ const updateModelDetails = (): void => {
   }
 
   modelDescription.textContent = selectedModel.description;
+
   modelCodeSuggestion.textContent = CODE_SUGGESTION_LABELS[selectedModel.codeSuggestionMode];
 
   updateComparisonSelectionState();
@@ -527,6 +487,7 @@ const renderModelComparison = (): void => {
     });
 
     card.append(title, description, capability, selectButton);
+
     modelComparisonList.append(card);
   }
 
@@ -611,12 +572,14 @@ const loadModels = async (): Promise<void> => {
     modelSelect.innerHTML = '<option>No se han podido cargar los modelos</option>';
 
     modelDescription.textContent = 'No se ha podido obtener la información de los modelos.';
+
     modelCodeSuggestion.textContent = '-';
 
     modelComparisonList.replaceChildren();
     modelComparison.hidden = true;
 
     compareModelsButton.setAttribute('aria-expanded', 'false');
+
     compareModelsButton.textContent = 'Comparar modelos';
 
     hideValidationNotice();
@@ -638,6 +601,7 @@ const executeAssistant = async (): Promise<void> => {
   }
 
   const definition = OPERATION_DEFINITIONS[selectedOperation];
+
   const context = contextInput.value.trim();
 
   const requestBody: Record<string, string> = {
@@ -653,7 +617,9 @@ const executeAssistant = async (): Promise<void> => {
   executeButton.textContent = 'Ejecutando...';
 
   hideValidationNotice();
+
   setResultMessage('Procesando la solicitud...', true);
+
   updateInteractionState();
 
   try {
@@ -668,7 +634,7 @@ const executeAssistant = async (): Promise<void> => {
     if (!response.ok) {
       const errorResponse = (await response.json()) as AssistantErrorResponse;
 
-      setResultMessage(errorResponse.error || 'No se ha podido completar la operación.', true);
+      setResultMessage(errorResponse.message || 'No se ha podido completar la operación.', true);
 
       return;
     }
