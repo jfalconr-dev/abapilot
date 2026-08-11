@@ -11,6 +11,9 @@ const defaultModel = modelCatalog.getById(DEFAULT_MODEL_ID);
 const expectedMetadata = {
   modelId: DEFAULT_MODEL_ID,
   codeSuggestionMode: defaultModel.codeSuggestionMode,
+  policy: {
+    filtered: false,
+  },
   validation: PROFESSIONAL_VALIDATION,
 };
 

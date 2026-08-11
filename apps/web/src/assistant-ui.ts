@@ -21,7 +21,11 @@ export interface CodeContentSegment {
   readonly content: string;
 }
 
-export type AssistantContentSegment = TextContentSegment | CodeContentSegment;
+export interface PolicyNoticeSegment {
+  readonly type: 'policy-notice';
+}
+
+export type AssistantContentSegment = TextContentSegment | CodeContentSegment | PolicyNoticeSegment;
 
 export const OPERATION_DEFINITIONS: Readonly<Record<Operation, OperationDefinition>> = {
   query: {
@@ -55,7 +59,22 @@ export const CODE_SUGGESTION_LABELS: Readonly<Record<CodeSuggestionMode, string>
 
 const CODE_FENCE = '```';
 
-export const parseAssistantContent = (content: string): readonly AssistantContentSegment[] => {
+export const FILTERED_CODE_MARKER = '[[ABAPILOT_CODE_BLOCK_FILTERED]]';
+
+export const parseAssistantContent = (
+  content: string,
+  codeFiltered = false,
+): readonly AssistantContentSegment[] => {
+  const segments = parseCodeContent(content);
+
+  if (!codeFiltered) {
+    return segments;
+  }
+
+  return splitFilteredCodeMarkers(segments);
+};
+
+const parseCodeContent = (content: string): readonly AssistantContentSegment[] => {
   const segments: AssistantContentSegment[] = [];
   let currentIndex = 0;
 
@@ -102,6 +121,47 @@ export const parseAssistantContent = (content: string): readonly AssistantConten
   }
 
   return segments;
+};
+
+const splitFilteredCodeMarkers = (
+  segments: readonly AssistantContentSegment[],
+): readonly AssistantContentSegment[] => {
+  const result: AssistantContentSegment[] = [];
+
+  for (const segment of segments) {
+    if (segment.type !== 'text') {
+      result.push(segment);
+      continue;
+    }
+
+    appendTextWithFilteredCodeMarkers(result, segment.content);
+  }
+
+  return result;
+};
+
+const appendTextWithFilteredCodeMarkers = (
+  segments: AssistantContentSegment[],
+  content: string,
+): void => {
+  let currentIndex = 0;
+
+  while (currentIndex < content.length) {
+    const markerIndex = content.indexOf(FILTERED_CODE_MARKER, currentIndex);
+
+    if (markerIndex === -1) {
+      appendTextSegment(segments, content.slice(currentIndex));
+      break;
+    }
+
+    appendTextSegment(segments, content.slice(currentIndex, markerIndex));
+
+    segments.push({
+      type: 'policy-notice',
+    });
+
+    currentIndex = markerIndex + FILTERED_CODE_MARKER.length;
+  }
 };
 
 const appendTextSegment = (segments: AssistantContentSegment[], content: string): void => {

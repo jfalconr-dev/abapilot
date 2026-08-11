@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   CODE_SUGGESTION_LABELS,
+  FILTERED_CODE_MARKER,
   OPERATION_DEFINITIONS,
   parseAssistantContent,
 } from '../src/assistant-ui.js';
@@ -100,6 +101,72 @@ describe('parseAssistantContent', () => {
       {
         type: 'text',
         content: response,
+      },
+    ]);
+  });
+
+  it('converts the reserved filtered-code marker into a policy notice when filtering metadata is true', () => {
+    const response = [
+      'La explicación anterior se conserva.',
+      '',
+      FILTERED_CODE_MARKER,
+      '',
+      'La explicación posterior también se conserva.',
+    ].join('\n');
+
+    expect(parseAssistantContent(response, true)).toEqual([
+      {
+        type: 'text',
+        content: 'La explicación anterior se conserva.',
+      },
+      {
+        type: 'policy-notice',
+      },
+      {
+        type: 'text',
+        content: 'La explicación posterior también se conserva.',
+      },
+    ]);
+  });
+
+  it('treats the reserved marker as ordinary LLM text when filtering metadata is false', () => {
+    const response = ['El modelo ha escrito literalmente:', FILTERED_CODE_MARKER].join('\n');
+
+    expect(parseAssistantContent(response, false)).toEqual([
+      {
+        type: 'text',
+        content: response,
+      },
+    ]);
+  });
+
+  it('converts multiple filtered-code markers when filtering metadata is true', () => {
+    const response = [
+      'Primera explicación.',
+      FILTERED_CODE_MARKER,
+      'Texto intermedio.',
+      FILTERED_CODE_MARKER,
+      'Texto final.',
+    ].join('\n');
+
+    expect(parseAssistantContent(response, true)).toEqual([
+      {
+        type: 'text',
+        content: 'Primera explicación.',
+      },
+      {
+        type: 'policy-notice',
+      },
+      {
+        type: 'text',
+        content: 'Texto intermedio.',
+      },
+      {
+        type: 'policy-notice',
+      },
+      {
+        type: 'text',
+        content: 'Texto final.',
       },
     ]);
   });

@@ -10,6 +10,7 @@ import type {
 } from '@abapilot/core';
 import type { NextFunction, Request, Response } from 'express';
 
+import { applyAssistantResponsePolicy } from './assistant-response-policy.js';
 import { PROFESSIONAL_VALIDATION } from './professional-validation.js';
 
 interface AssistantQueryRequestBody {
@@ -180,6 +181,10 @@ export class AssistantController {
     readonly response: string;
     readonly modelId: string;
     readonly codeSuggestionMode: 'none' | 'snippets' | 'full';
+    readonly policy: {
+      readonly filtered: boolean;
+      readonly reason?: 'CODE_SUGGESTION_NOT_ALLOWED';
+    };
     readonly validation: {
       readonly title: string;
       readonly message: string;
@@ -187,10 +192,16 @@ export class AssistantController {
   } {
     const modelDefinition = this.modelCatalog.getById(modelId);
 
+    const policyResult = applyAssistantResponsePolicy(
+      result.content,
+      modelDefinition.codeSuggestionMode,
+    );
+
     return {
-      response: result.content,
+      response: policyResult.content,
       modelId: modelDefinition.id,
       codeSuggestionMode: modelDefinition.codeSuggestionMode,
+      policy: policyResult.policy,
       validation: PROFESSIONAL_VALIDATION,
     };
   }

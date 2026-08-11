@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL_ID, ModelCatalog } from '@abapilot/core';
+import { DEFAULT_MODEL_ID, ModelCatalog, type AIProvider } from '@abapilot/core';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
@@ -11,6 +11,9 @@ const defaultModel = modelCatalog.getById(DEFAULT_MODEL_ID);
 const expectedMetadata = {
   modelId: DEFAULT_MODEL_ID,
   codeSuggestionMode: defaultModel.codeSuggestionMode,
+  policy: {
+    filtered: false,
+  },
   validation: PROFESSIONAL_VALIDATION,
 };
 
@@ -140,5 +143,65 @@ describe('POST /assistant/review', () => {
       code: 'MODEL_NOT_SUPPORTED',
       message: 'El modelo solicitado no está soportado por ABAPilot.',
     });
+  });
+
+  it('filters fenced code returned by a none model while preserving the explanation', async () => {
+    const provider: AIProvider = {
+      generateResponse: () =>
+        Promise.resolve({
+          content: 'Respuesta de consulta.',
+        }),
+
+      explainCode: () =>
+        Promise.resolve({
+          content: 'Respuesta de explicación.',
+        }),
+
+      reviewCode: () =>
+        Promise.resolve({
+          content: [
+            'La lectura completa de MARA puede suponer un riesgo condicionado por el volumen.',
+            '',
+            'Código propuesto:',
+            '',
+            '```abap',
+            'SELECT matnr',
+            '  FROM mara',
+            '  INTO TABLE lt_mara.',
+            '```',
+            '',
+            'También deben revisarse los requisitos funcionales antes de realizar cambios.',
+          ].join('\n'),
+        }),
+    };
+
+    const response = await request(createTestApp(provider)).post('/assistant/review').send({
+      modelId: 'llama-3.2-3b',
+      code: 'SELECT * FROM mara INTO TABLE lt_mara.',
+    });
+
+    expect(response.status).toBe(200);
+
+    expect(response.body).toEqual({
+      response: [
+        'La lectura completa de MARA puede suponer un riesgo condicionado por el volumen.',
+        '',
+        'Código propuesto:',
+        '',
+        '[[ABAPILOT_CODE_BLOCK_FILTERED]]',
+        '',
+        'También deben revisarse los requisitos funcionales antes de realizar cambios.',
+      ].join('\n'),
+      modelId: 'llama-3.2-3b',
+      codeSuggestionMode: 'none',
+      policy: {
+        filtered: true,
+        reason: 'CODE_SUGGESTION_NOT_ALLOWED',
+      },
+      validation: PROFESSIONAL_VALIDATION,
+    });
+
+    expect(response.text).not.toContain('SELECT matnr');
+    expect(response.text).not.toContain('INTO TABLE lt_mara');
   });
 });

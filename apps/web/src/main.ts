@@ -24,6 +24,10 @@ interface AssistantResponse {
   readonly response: string;
   readonly modelId: string;
   readonly codeSuggestionMode: CodeSuggestionMode;
+  readonly policy: {
+    readonly filtered: boolean;
+    readonly reason?: 'CODE_SUGGESTION_NOT_ALLOWED';
+  };
   readonly validation: {
     readonly title: string;
     readonly message: string;
@@ -309,14 +313,36 @@ const appendCodeBlock = (language: string, codeContent: string): void => {
   resultContent.append(container);
 };
 
-const renderAssistantResponse = (content: string): void => {
+const appendPolicyNotice = (): void => {
+  const container = document.createElement('div');
+  const title = document.createElement('strong');
+  const message = document.createElement('p');
+
+  container.className = 'policy-notice';
+
+  title.textContent = 'Código omitido por política';
+
+  message.textContent =
+    'El modelo seleccionado no permite sugerencias de código. ' +
+    'ABAPilot ha omitido este bloque de la respuesta.';
+
+  container.append(title, message);
+  resultContent.append(container);
+};
+
+const renderAssistantResponse = (content: string, codeFiltered: boolean): void => {
   resultContent.replaceChildren();
 
-  const segments = parseAssistantContent(content);
+  const segments = parseAssistantContent(content, codeFiltered);
 
   for (const segment of segments) {
     if (segment.type === 'text') {
       appendTextBlock(segment.content);
+      continue;
+    }
+
+    if (segment.type === 'policy-notice') {
+      appendPolicyNotice();
       continue;
     }
 
@@ -642,7 +668,7 @@ const executeAssistant = async (): Promise<void> => {
     const assistantResponse = (await response.json()) as AssistantResponse;
 
     showValidationNotice(assistantResponse);
-    renderAssistantResponse(assistantResponse.response);
+    renderAssistantResponse(assistantResponse.response, assistantResponse.policy.filtered);
   } catch {
     hideValidationNotice();
 
