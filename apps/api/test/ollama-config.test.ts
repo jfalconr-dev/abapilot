@@ -8,7 +8,7 @@ describe('loadOllamaConfig', () => {
 
     expect(config).toEqual({
       baseUrl: 'http://localhost:11434',
-      timeoutMs: 120_000,
+      timeoutMs: 180_000,
     });
   });
 

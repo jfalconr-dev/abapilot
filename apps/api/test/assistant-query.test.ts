@@ -168,7 +168,7 @@ describe('POST /assistant/query', () => {
     expect(responseBody.validation.title).toBe('Validación profesional requerida');
 
     expect(responseBody.validation.message).toContain(
-      'No incorpores código ni ejecutes acciones propuestas directamente en entornos productivos',
+      'No ejecutes las acciones propuestas ni utilices el código generado directamente en entornos productivos',
     );
 
     expect(responseBody.validation.message).toContain('sin una revisión técnica previa.');

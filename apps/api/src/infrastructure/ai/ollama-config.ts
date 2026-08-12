@@ -6,7 +6,7 @@ export interface OllamaConfig {
 type Environment = Readonly<Record<string, string | undefined>>;
 
 const DEFAULT_BASE_URL = 'http://localhost:11434';
-const DEFAULT_TIMEOUT_MS = 120_000;
+const DEFAULT_TIMEOUT_MS = 180_000;
 
 export const loadOllamaConfig = (environment: Environment = process.env): OllamaConfig => {
   const baseUrl = environment.OLLAMA_BASE_URL?.trim() || DEFAULT_BASE_URL;
