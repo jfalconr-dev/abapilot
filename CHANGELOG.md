@@ -6,6 +6,8 @@ El formato se inspira en Keep a Changelog y el proyecto utiliza versionado semá
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-13
+
 ### Added
 
 - Interfaz web desarrollada con Vite, TypeScript y HTML/CSS nativos.
