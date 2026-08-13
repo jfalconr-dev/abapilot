@@ -1,10 +1,34 @@
 # Changelog
 
-Todos los cambios relevantes de ABAPilot se documentarán en este archivo.
+Todos los cambios relevantes de ABAPCompass se documentarán en este archivo.
 
 El formato se inspira en Keep a Changelog y el proyecto utiliza versionado semántico.
 
 ## [Unreleased]
+
+### Added
+
+- Interfaz web desarrollada con Vite, TypeScript y HTML/CSS nativos.
+- Endpoint `GET /models` para exponer el catálogo público de modelos soportados.
+- Catálogo controlado de modelos mediante `ModelCatalog`.
+- Selección dinámica del modelo utilizado en cada operación.
+- Resolución dinámica de proveedores mediante `AIProviderResolver`.
+- Políticas de generación de código `none`, `snippets` y `full` asociadas a los modelos.
+- Aplicación preventiva de las políticas de generación mediante las instrucciones enviadas al modelo.
+- Filtrado determinista de bloques de código delimitados para la política `none`.
+- Metadatos estructurados para indicar si se ha aplicado filtrado y, cuando corresponde, su motivo.
+- Aviso de validación profesional incorporado por el backend en las respuestas satisfactorias.
+- Representación segura de las respuestas del modelo en la interfaz web.
+- Pruebas automatizadas para el catálogo de modelos, resolución de proveedores, políticas de respuesta e interfaz web.
+
+### Changed
+
+- Renombrado del proyecto a ABAPCompass.
+- Actualización de los paquetes npm al scope `@abapcompass`.
+- Adaptación de los contratos REST para soportar selección de modelos y políticas de generación.
+- Actualización de la documentación técnica y operativa para reflejar la arquitectura y el comportamiento de v0.3.0.
+- Actualización de las instrucciones de instalación y ejecución para permitir la puesta en marcha del proyecto desde el repositorio público.
+- Unificación del timeout predeterminado de Ollama en `180000` ms.
 
 ## [0.2.0] - 2026-08-06
 

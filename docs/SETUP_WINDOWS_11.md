@@ -1,11 +1,11 @@
 # Preparación del entorno en Windows 11
 
-Esta guía está pensada para una persona habituada al ABAP Workbench y que empieza a trabajar con Visual Studio Code, Git y Node.js.
+Esta guía describe la preparación básica de un entorno Windows 11 para trabajar con ABAPCompass desde Visual Studio Code.
 
 ## 1. Instalar Visual Studio Code
 
 1. Descarga e instala Visual Studio Code para Windows.
-2. Mantén activadas las opciones para añadir `code` al PATH y abrir carpetas con VS Code.
+2. Mantén activadas las opciones para añadir `code` al PATH y abrir carpetas con Visual Studio Code.
 3. Comprueba la instalación en PowerShell:
 
 ```powershell
@@ -16,107 +16,169 @@ code --version
 
 1. Instala Git for Windows.
 2. Conserva las opciones recomendadas del instalador.
-3. Selecciona Visual Studio Code como editor predeterminado de Git cuando se ofrezca esa opción.
-4. Comprueba:
+3. Comprueba la instalación:
 
 ```powershell
 git --version
 ```
 
-Configura tu identidad una única vez:
+Si vas a realizar cambios en el repositorio, configura tu propia identidad de Git:
 
 ```powershell
-git config --global user.name "Jose Falcon"
-git config --global user.email "TU_CORREO_DE_GITHUB"
+git config --global user.name "TU_NOMBRE"
+git config --global user.email "TU_CORREO"
 ```
 
-El correo debe coincidir con uno verificado en GitHub o con el correo privado `noreply` que GitHub proporciona.
+## 3. Instalar Node.js 22
 
-## 3. Instalar Node.js 22 LTS
+Instala una versión Node.js `22.x`.
 
-1. Instala la versión LTS 22.x de Node.js.
-2. Reinicia VS Code si estaba abierto.
-3. Comprueba:
+Reinicia Visual Studio Code si estaba abierto y comprueba:
 
 ```powershell
 node --version
 npm --version
 ```
 
-Resultados esperados:
+El proyecto requiere:
 
-- Node.js: versión `v22.x.x`.
-- npm: versión `10.x` o superior.
+- Node.js `>=22 <23`.
+- npm `>=10`.
 
-## 4. Extensiones de VS Code
+## 4. Instalar Ollama
 
-Al abrir el proyecto, VS Code sugerirá instalar:
-
-- ESLint.
-- Prettier - Code formatter.
-- GitHub Pull Requests and Issues.
-
-Acepta la recomendación. No es necesario instalar más extensiones inicialmente.
-
-## 5. Abrir el proyecto
-
-Desde PowerShell:
+Instala Ollama para Windows y comprueba que está disponible:
 
 ```powershell
-cd C:\ruta\donde\guardes\proyectos
-code abapilot
+ollama --version
 ```
 
-Conceptos equivalentes al ABAP Workbench:
+ABAPCompass v0.3.0 utiliza los siguientes modelos:
 
-| ABAP Workbench        | VS Code / proyecto          |
-| --------------------- | --------------------------- |
-| Paquete               | Carpeta o workspace         |
-| Objeto de desarrollo  | Archivo fuente              |
-| Activar               | Guardar, compilar y validar |
-| Syntax Check          | TypeScript + ESLint         |
-| ATC / Code Inspector  | ESLint + tests + CI         |
-| Orden de transporte   | Commit de Git               |
-| Sistema de transporte | Repositorio remoto GitHub   |
+```powershell
+ollama pull llama3.2:3b
+ollama pull qwen2.5-coder:7b
+ollama pull deepseek-coder-v2:16b
+```
 
-La equivalencia no es exacta, pero ayuda a construir el modelo mental inicial.
+Comprueba los modelos instalados:
 
-## 6. Instalar dependencias
+```powershell
+ollama list
+```
 
-En la terminal integrada de VS Code (`Terminal > New Terminal`):
+No es necesario instalar los tres modelos para arrancar ABAPCompass, pero solo podrán utilizarse aquellos que estén disponibles localmente en Ollama.
+
+## 5. Clonar el repositorio
+
+Desde PowerShell, sitúate en el directorio donde quieras almacenar el proyecto y ejecuta:
+
+```powershell
+git clone https://github.com/jfalconr-dev/abapcompass.git
+cd abapcompass
+```
+
+Puedes abrir el proyecto en Visual Studio Code mediante:
+
+```powershell
+code .
+```
+
+## 6. Extensiones de Visual Studio Code
+
+Al abrir el proyecto, Visual Studio Code puede sugerir las extensiones recomendadas configuradas en el repositorio.
+
+Instala las extensiones recomendadas si deseas utilizar el entorno de desarrollo previsto para el proyecto.
+
+## 7. Instalar dependencias
+
+Desde la raíz del repositorio:
 
 ```powershell
 npm install
 ```
 
-Este comando descargará las herramientas declaradas en `package.json` y generará `package-lock.json`.
+Al utilizar npm Workspaces, este comando instala las dependencias necesarias para el monorepo.
 
-## 7. Validar la instalación
+## 8. Configurar las variables de entorno
 
-```powershell
-npm run validate
-```
-
-La validación debe terminar sin errores y ejecutará:
-
-1. Comprobación de formato.
-2. Análisis estático.
-3. Validación de tipos.
-4. Pruebas automatizadas.
-5. Compilación.
-
-## 8. Autenticación con GitHub
-
-La forma más sencilla es utilizar la opción **Sign in to GitHub** de VS Code. El navegador pedirá autorizar la aplicación.
-
-No introduzcas contraseñas ni tokens dentro de archivos del proyecto.
-
-## 9. Variables de entorno
-
-Cuando sea necesario:
+Crea el archivo `.env` a partir de la plantilla incluida en el repositorio:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-El archivo `.env` será local y no se subirá a GitHub.
+La configuración inicial es:
+
+```dotenv
+NODE_ENV=development
+API_PORT=3000
+WEB_PORT=5173
+
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_TIMEOUT_MS=180000
+```
+
+El archivo `.env` es local y está excluido del control de versiones.
+
+Los valores pueden adaptarse al entorno local cuando sea necesario. En particular, `OLLAMA_TIMEOUT_MS` puede aumentarse si el hardware requiere más tiempo para completar la inferencia.
+
+## 9. Validar la instalación
+
+Desde la raíz del repositorio:
+
+```powershell
+npm run validate
+```
+
+La validación ejecuta:
+
+1. Comprobación de formato.
+2. Compilación del núcleo.
+3. Análisis estático.
+4. Comprobación de tipos.
+5. Pruebas automatizadas.
+6. Compilación del proyecto.
+
+El proceso debe finalizar sin errores.
+
+## 10. Ejecutar ABAPCompass
+
+La API y la interfaz web se ejecutan como procesos independientes y deben permanecer en ejecución mientras se utiliza ABAPCompass.
+
+Compila primero la API:
+
+```powershell
+npm run build --workspace @abapcompass/api
+```
+
+Arranca la API:
+
+```powershell
+npm run start --workspace @abapcompass/api
+```
+
+Abre un segundo terminal en la raíz del proyecto y arranca la interfaz web:
+
+```powershell
+npm run dev --workspace @abapcompass/web
+```
+
+Con la configuración predeterminada:
+
+- API: `http://localhost:3000`.
+- Interfaz web: `http://localhost:5173`.
+
+Abre en el navegador:
+
+```text
+http://localhost:5173
+```
+
+## 11. Autenticación con GitHub
+
+La autenticación con GitHub solo es necesaria si se van a realizar operaciones que requieran acceso autenticado al repositorio.
+
+Puede utilizarse la integración de GitHub disponible en Visual Studio Code o los mecanismos de autenticación proporcionados por Git.
+
+No deben almacenarse contraseñas, tokens ni otras credenciales dentro de los archivos del proyecto.

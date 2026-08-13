@@ -1,66 +1,121 @@
 # Guía operativa de comandos
 
-## Rutina antes de empezar a trabajar
+Este documento reúne los principales comandos utilizados para desarrollar, validar y ejecutar ABAPCompass.
+
+## Preparar el entorno
+
+Instalar las dependencias del monorepo:
+
+```powershell
+npm install
+```
+
+`npm install` es necesario al preparar el entorno por primera vez y cuando cambian las dependencias del proyecto.
+
+## Actualizar la rama de desarrollo
 
 ```powershell
 git switch develop
 git pull
-npm install
 ```
 
-`npm install` solo es imprescindible cuando cambia `package.json` o al preparar el entorno por primera vez.
-
-## Crear una rama para una funcionalidad
-
-```powershell
-git switch -c feature/nombre-breve
-```
-
-Ejemplo:
-
-```powershell
-git switch -c feature/dashboard-shell
-```
-
-## Comprobar el estado
+## Comprobar el estado del repositorio
 
 ```powershell
 git status
 ```
 
-## Validar antes de guardar una versión
+## Validar el proyecto
+
+Ejecutar la validación completa:
 
 ```powershell
 npm run validate
 ```
 
+La validación incluye comprobación de formato, compilación del núcleo, análisis estático, comprobación de tipos, pruebas automatizadas y compilación del proyecto.
+
+## Ejecutar ABAPCompass
+
+### Compilar la API
+
+```powershell
+npm run build --workspace @abapcompass/api
+```
+
+### Arrancar la API
+
+```powershell
+npm run start --workspace @abapcompass/api
+```
+
+### Arrancar la interfaz web
+
+En un segundo terminal:
+
+```powershell
+npm run dev --workspace @abapcompass/web
+```
+
+Con la configuración predeterminada:
+
+- API: `http://localhost:3000`.
+- Interfaz web: `http://localhost:5173`.
+
+Ollama debe estar en ejecución y el modelo seleccionado debe estar instalado para utilizar ABAPCompass con modelos reales.
+
+## Comandos de Ollama
+
+Comprobar los modelos instalados:
+
+```powershell
+ollama list
+```
+
+Descargar los modelos utilizados por ABAPCompass:
+
+```powershell
+ollama pull llama3.2:3b
+ollama pull qwen2.5-coder:7b
+ollama pull deepseek-coder-v2:16b
+```
+
 ## Registrar cambios
+
+Comprobar primero los cambios pendientes:
+
+```powershell
+git status
+```
+
+Añadir los archivos correspondientes:
 
 ```powershell
 git add .
-git commit -m "feat(web): add dashboard shell"
-git push -u origin feature/dashboard-shell
 ```
 
-## Volver a la rama de integración
+Crear el commit siguiendo Conventional Commits:
 
 ```powershell
-git switch develop
-git pull
+git commit -m "tipo: descripcion"
 ```
 
-## Comandos de recuperación seguros
-
-Descartar cambios de un archivo todavía no confirmado:
+Publicar los cambios de la rama `develop`:
 
 ```powershell
-git restore ruta\archivo
+git push origin develop
 ```
 
-Ver los últimos commits:
+## Consultar el historial
 
 ```powershell
 git log --oneline -10
 ```
 
-No utilizar `git reset --hard`, `git clean -fd` o `git push --force` sin revisar antes la situación.
+## Descartar cambios no confirmados de un archivo
+
+```powershell
+git restore ruta\archivo
+```
+
+Antes de utilizar comandos destructivos como `git reset --hard`, `git clean -fd` o `git push --force`, debe revisarse el estado del repositorio y sus posibles consecuencias.

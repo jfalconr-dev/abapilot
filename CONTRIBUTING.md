@@ -1,6 +1,6 @@
 # Contribución
 
-El desarrollo de ABAPilot sigue un flujo de trabajo basado en buenas prácticas de ingeniería del software.
+El desarrollo de ABAPCompass sigue un flujo de trabajo basado en buenas prácticas de ingeniería del software.
 
 ## Estrategia de ramas
 
