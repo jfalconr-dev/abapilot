@@ -1,4 +1,4 @@
-import { ModelCatalog } from '@abapilot/core';
+import { ModelCatalog } from '@abapcompass/core';
 import { Router } from 'express';
 
 const router = Router();

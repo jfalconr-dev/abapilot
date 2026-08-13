@@ -1,7 +1,7 @@
-import type { CodeSuggestionMode } from '@abapilot/core';
+import type { CodeSuggestionMode } from '@abapcompass/core';
 
 const CODE_FENCE = '```';
-const FILTERED_CODE_MARKER = '[[ABAPILOT_CODE_BLOCK_FILTERED]]';
+const FILTERED_CODE_MARKER = '[[ABAPCOMPASS_CODE_BLOCK_FILTERED]]';
 
 export type AssistantResponsePolicyReason = 'CODE_SUGGESTION_NOT_ALLOWED';
 

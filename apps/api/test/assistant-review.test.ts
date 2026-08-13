@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL_ID, ModelCatalog, type AIProvider } from '@abapilot/core';
+import { DEFAULT_MODEL_ID, ModelCatalog, type AIProvider } from '@abapcompass/core';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
@@ -141,7 +141,7 @@ describe('POST /assistant/review', () => {
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
       code: 'MODEL_NOT_SUPPORTED',
-      message: 'El modelo solicitado no está soportado por ABAPilot.',
+      message: 'El modelo solicitado no está soportado por ABAPCompass.',
     });
   });
 
@@ -188,7 +188,7 @@ describe('POST /assistant/review', () => {
         '',
         'Código propuesto:',
         '',
-        '[[ABAPILOT_CODE_BLOCK_FILTERED]]',
+        '[[ABAPCOMPASS_CODE_BLOCK_FILTERED]]',
         '',
         'También deben revisarse los requisitos funcionales antes de realizar cambios.',
       ].join('\n'),

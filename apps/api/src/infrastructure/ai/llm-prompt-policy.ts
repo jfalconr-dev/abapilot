@@ -1,4 +1,4 @@
-import type { CodeSuggestionMode } from '@abapilot/core';
+import type { CodeSuggestionMode } from '@abapcompass/core';
 
 export type LlmOperation = 'query' | 'explain' | 'review';
 

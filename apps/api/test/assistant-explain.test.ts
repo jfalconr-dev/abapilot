@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL_ID, ModelCatalog } from '@abapilot/core';
+import { DEFAULT_MODEL_ID, ModelCatalog } from '@abapcompass/core';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
@@ -141,7 +141,7 @@ describe('POST /assistant/explain', () => {
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
       code: 'MODEL_NOT_SUPPORTED',
-      message: 'El modelo solicitado no está soportado por ABAPilot.',
+      message: 'El modelo solicitado no está soportado por ABAPCompass.',
     });
   });
 });

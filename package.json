@@ -1,5 +1,5 @@
 {
-  "name": "abapilot",
+  "name": "abapcompass",
   "version": "0.2.0",
   "private": true,
   "description": "AI Workspace para profesionales SAP ECC",
@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
-    "build:core": "npm run build --workspace @abapilot/core",
+    "build:core": "npm run build --workspace @abapcompass/core",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write .",

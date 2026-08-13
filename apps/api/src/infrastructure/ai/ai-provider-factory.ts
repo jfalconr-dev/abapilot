@@ -1,4 +1,8 @@
-import { AIProviderResolver, type AIProviderFactories, type ModelDefinition } from '@abapilot/core';
+import {
+  AIProviderResolver,
+  type AIProviderFactories,
+  type ModelDefinition,
+} from '@abapcompass/core';
 
 import { OllamaAIProvider } from './ollama-ai-provider.js';
 import { loadOllamaConfig } from './ollama-config.js';

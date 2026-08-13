@@ -59,7 +59,7 @@ export const CODE_SUGGESTION_LABELS: Readonly<Record<CodeSuggestionMode, string>
 
 const CODE_FENCE = '```';
 
-export const FILTERED_CODE_MARKER = '[[ABAPILOT_CODE_BLOCK_FILTERED]]';
+export const FILTERED_CODE_MARKER = '[[ABAPCOMPASS_CODE_BLOCK_FILTERED]]';
 
 export const parseAssistantContent = (
   content: string,

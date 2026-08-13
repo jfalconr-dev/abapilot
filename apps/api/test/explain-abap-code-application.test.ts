@@ -5,7 +5,7 @@ import {
   type AIProvider,
   type AbapCode,
   type Context,
-} from '@abapilot/core';
+} from '@abapcompass/core';
 import { describe, expect, it } from 'vitest';
 
 import { createAssistantApplication } from '../src/application/index.js';

@@ -48,7 +48,7 @@ describe('ModelCatalog', () => {
     });
   });
 
-  it('rejects a model that is not supported by ABAPilot', () => {
+  it('rejects a model that is not supported by ABAPCompass', () => {
     expect(() => catalog.getById('unknown-model')).toThrow(ModelNotSupportedError);
   });
 });

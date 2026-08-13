@@ -4,7 +4,7 @@ import {
   ModelCatalog,
   ReviewAbapCodeUseCase,
   type AIProviderResolver,
-} from '@abapilot/core';
+} from '@abapcompass/core';
 
 import { createAIProviderResolver } from '../infrastructure/ai/index.js';
 

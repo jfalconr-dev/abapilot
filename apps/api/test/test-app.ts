@@ -1,4 +1,4 @@
-import { AIProviderResolver, ModelCatalog, type AIProvider } from '@abapilot/core';
+import { AIProviderResolver, ModelCatalog, type AIProvider } from '@abapcompass/core';
 import type { Express } from 'express';
 
 import { createAssistantApplication } from '../src/application/index.js';

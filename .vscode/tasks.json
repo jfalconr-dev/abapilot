@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "ABAPilot: validar proyecto",
+      "label": "ABAPCompass: validar proyecto",
       "type": "npm",
       "script": "validate",
       "problemMatcher": ["$eslint-stylish", "$tsc"],
@@ -12,7 +12,7 @@
       }
     },
     {
-      "label": "ABAPilot: ejecutar tests",
+      "label": "ABAPCompass: ejecutar tests",
       "type": "npm",
       "script": "test:watch",
       "problemMatcher": [],

@@ -1,4 +1,4 @@
-import { ModelNotSupportedError } from '@abapilot/core';
+import { ModelNotSupportedError } from '@abapcompass/core';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
@@ -49,7 +49,7 @@ describe('errorHandler', () => {
     expect(response.status).toBe(400);
     expect(response.body).toEqual({
       code: 'MODEL_NOT_SUPPORTED',
-      message: 'El modelo solicitado no está soportado por ABAPilot.',
+      message: 'El modelo solicitado no está soportado por ABAPCompass.',
     });
   });
 

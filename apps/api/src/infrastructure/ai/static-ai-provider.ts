@@ -1,4 +1,4 @@
-import type { AIProvider, AbapCode, Context, Query, Response } from '@abapilot/core';
+import type { AIProvider, AbapCode, Context, Query, Response } from '@abapcompass/core';
 
 export class StaticAIProvider implements AIProvider {
   public generateResponse(query: Query, context?: Context): Promise<Response> {

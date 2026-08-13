@@ -36,7 +36,7 @@ describe('AIProviderResolver', () => {
     expect(factory).toHaveBeenCalledWith(modelDefinition);
   });
 
-  it('rejects a provider that cannot be resolved by ABAPilot', () => {
+  it('rejects a provider that cannot be resolved by ABAPCompass', () => {
     const resolver = new AIProviderResolver({});
 
     expect(() => resolver.resolve(modelDefinition)).toThrow(AIProviderNotSupportedError);

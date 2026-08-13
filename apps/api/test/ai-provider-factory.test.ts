@@ -1,4 +1,4 @@
-import { ModelCatalog, type AIProvider, type ModelDefinition } from '@abapilot/core';
+import { ModelCatalog, type AIProvider, type ModelDefinition } from '@abapcompass/core';
 import { describe, expect, it } from 'vitest';
 
 import { createAIProviderResolver } from '../src/infrastructure/ai/ai-provider-factory.js';
@@ -32,7 +32,7 @@ describe('createAIProviderResolver', () => {
     };
 
     expect(() => resolver.resolve(modelDefinition)).toThrow(
-      'AI provider "unsupported" is not supported by ABAPilot.',
+      'AI provider "unsupported" is not supported by ABAPCompass.',
     );
   });
 });

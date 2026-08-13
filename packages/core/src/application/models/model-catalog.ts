@@ -30,17 +30,17 @@ const MODEL_DEFINITIONS: readonly ModelDefinition[] = [
 export const DEFAULT_MODEL_ID = 'qwen-2.5-coder-7b' as const;
 
 /**
- * Raised when an operation requests a model that is not supported by ABAPilot.
+ * Raised when an operation requests a model that is not supported by ABAPCompass.
  */
 export class ModelNotSupportedError extends Error {
   constructor(modelId: string) {
-    super(`Model "${modelId}" is not supported by ABAPilot.`);
+    super(`Model "${modelId}" is not supported by ABAPCompass.`);
     this.name = 'ModelNotSupportedError';
   }
 }
 
 /**
- * Provides access to the AI models explicitly supported by ABAPilot.
+ * Provides access to the AI models explicitly supported by ABAPCompass.
  */
 export class ModelCatalog {
   getAll(): readonly ModelDefinition[] {

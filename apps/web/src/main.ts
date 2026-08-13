@@ -42,7 +42,7 @@ interface AssistantErrorResponse {
 const appElement = document.querySelector<HTMLDivElement>('#app');
 
 if (appElement === null) {
-  throw new Error('No se ha encontrado el elemento raíz de ABAPilot.');
+  throw new Error('No se ha encontrado el elemento raíz de ABAPCompass.');
 }
 
 appElement.innerHTML = `
@@ -50,14 +50,14 @@ appElement.innerHTML = `
     <header class="app-header">
       <div>
         <p class="app-eyebrow">AI Workspace para SAP ECC</p>
-        <h1>ABAPilot</h1>
+        <h1>ABAPCompass</h1>
         <p class="app-subtitle">
           Asistente para consulta, explicación y revisión de código ABAP.
         </p>
       </div>
     </header>
 
-    <section class="workspace" aria-label="Área de trabajo de ABAPilot">
+    <section class="workspace" aria-label="Área de trabajo de ABAPCompass">
       <div class="workspace-toolbar">
         <div class="model-section">
           <label class="field">
@@ -236,7 +236,7 @@ if (
   validationNoticeText === null ||
   responseMetadata === null
 ) {
-  throw new Error('No se han encontrado los controles principales de ABAPilot.');
+  throw new Error('No se han encontrado los controles principales de ABAPCompass.');
 }
 
 let selectedOperation: Operation = 'query';
@@ -324,7 +324,7 @@ const appendPolicyNotice = (): void => {
 
   message.textContent =
     'El modelo seleccionado no permite sugerencias de código. ' +
-    'ABAPilot ha omitido este bloque de la respuesta.';
+    'ABAPCompass ha omitido este bloque de la respuesta.';
 
   container.append(title, message);
   resultContent.append(container);
@@ -611,7 +611,7 @@ const loadModels = async (): Promise<void> => {
     hideValidationNotice();
 
     setResultMessage(
-      'No se ha podido conectar con la API de ABAPilot. Comprueba que el servidor está en ejecución.',
+      'No se ha podido conectar con la API de ABAPCompass. Comprueba que el servidor está en ejecución.',
       true,
     );
 
@@ -673,7 +673,7 @@ const executeAssistant = async (): Promise<void> => {
     hideValidationNotice();
 
     setResultMessage(
-      'No se ha podido conectar con la API de ABAPilot. Comprueba que el servidor está en ejecución.',
+      'No se ha podido conectar con la API de ABAPCompass. Comprueba que el servidor está en ejecución.',
       true,
     );
   } finally {

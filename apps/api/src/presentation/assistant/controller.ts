@@ -7,7 +7,7 @@ import type {
   Query,
   Response as AssistantResult,
   ReviewAbapCodeUseCase,
-} from '@abapilot/core';
+} from '@abapcompass/core';
 import type { NextFunction, Request, Response } from 'express';
 
 import { applyAssistantResponsePolicy } from './assistant-response-policy.js';

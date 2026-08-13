@@ -1,4 +1,4 @@
-import { DEFAULT_MODEL_ID } from '@abapilot/core';
+import { DEFAULT_MODEL_ID } from '@abapcompass/core';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 

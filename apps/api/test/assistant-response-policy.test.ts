@@ -29,7 +29,7 @@ describe('applyAssistantResponsePolicy', () => {
       content: [
         'La consulta puede optimizarse.',
         '',
-        '[[ABAPILOT_CODE_BLOCK_FILTERED]]',
+        '[[ABAPCOMPASS_CODE_BLOCK_FILTERED]]',
         '',
         'También debe revisarse el contexto funcional.',
       ].join('\n'),

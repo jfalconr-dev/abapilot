@@ -3,7 +3,7 @@ import type {
   ExplainAbapCodeUseCase,
   ModelCatalog,
   ReviewAbapCodeUseCase,
-} from '@abapilot/core';
+} from '@abapcompass/core';
 import { Router, type Router as ExpressRouter } from 'express';
 
 import { AssistantController } from './controller.js';

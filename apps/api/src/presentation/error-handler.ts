@@ -1,4 +1,4 @@
-import { ModelNotSupportedError } from '@abapilot/core';
+import { ModelNotSupportedError } from '@abapcompass/core';
 import type { NextFunction, Request, Response } from 'express';
 
 import {
@@ -15,7 +15,7 @@ export const errorHandler = (
   if (error instanceof ModelNotSupportedError) {
     response.status(400).json({
       code: 'MODEL_NOT_SUPPORTED',
-      message: 'El modelo solicitado no está soportado por ABAPilot.',
+      message: 'El modelo solicitado no está soportado por ABAPCompass.',
     });
 
     return;

@@ -5,7 +5,7 @@ Write-Host 'La creación del repositorio remoto se realizará desde GitHub o Git
 
 git init -b main
 git add .
-git commit -m "chore: initialize ABAPilot v0.1.0"
+git commit -m "chore: initialize ABAPCompass v0.1.0"
 git switch -c develop
 
-Write-Host 'Repositorio local creado. Próximo paso: asociarlo con github.com/jfalconr-dev/abapilot.' -ForegroundColor Green
+Write-Host 'Repositorio local creado. Próximo paso: asociarlo con github.com/jfalconr-dev/abapcompass.' -ForegroundColor Green

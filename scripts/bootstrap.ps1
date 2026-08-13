@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 
-Write-Host 'ABAPilot - comprobación del entorno' -ForegroundColor Cyan
+Write-Host 'ABAPCompass - comprobación del entorno' -ForegroundColor Cyan
 
 $commands = @('git', 'node', 'npm', 'code')
 foreach ($command in $commands) {

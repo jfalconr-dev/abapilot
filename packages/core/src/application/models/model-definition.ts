@@ -4,7 +4,7 @@
 export type CodeSuggestionMode = 'none' | 'snippets' | 'full';
 
 /**
- * Represents the configuration of an AI model supported by ABAPilot.
+ * Represents the configuration of an AI model supported by ABAPCompass.
  */
 export interface ModelDefinition {
   readonly id: string;

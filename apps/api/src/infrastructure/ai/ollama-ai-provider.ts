@@ -5,7 +5,7 @@ import type {
   Context,
   Query,
   Response,
-} from '@abapilot/core';
+} from '@abapcompass/core';
 
 import { AIProviderTimeoutError, AIProviderUnavailableError } from './ai-provider-error.js';
 import { buildLlmPrompt, type LlmPrompt } from './llm-prompt-policy.js';

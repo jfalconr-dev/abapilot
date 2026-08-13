@@ -6,11 +6,11 @@ export type AIProviderFactory = (modelDefinition: ModelDefinition) => AIProvider
 export type AIProviderFactories = Readonly<Record<string, AIProviderFactory>>;
 
 /**
- * Raised when ABAPilot cannot resolve the provider configured for a model.
+ * Raised when ABAPCompass cannot resolve the provider configured for a model.
  */
 export class AIProviderNotSupportedError extends Error {
   constructor(providerId: string) {
-    super(`AI provider "${providerId}" is not supported by ABAPilot.`);
+    super(`AI provider "${providerId}" is not supported by ABAPCompass.`);
     this.name = 'AIProviderNotSupportedError';
   }
 }

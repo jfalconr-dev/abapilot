@@ -5,5 +5,5 @@ const port = loadApiPort();
 const app = createApp();
 
 app.listen(port, () => {
-  console.log(`ABAPilot API escuchando en http://localhost:${port}`);
+  console.log(`ABAPCompass API escuchando en http://localhost:${port}`);
 });
